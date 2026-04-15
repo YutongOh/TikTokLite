@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android 拍摄画幅适配规范页</title>
+  <style>
+    :root {
+      --bg: #090909;
+      --surface: #121212;
+      --surface-2: #181818;
+      --surface-3: #202020;
+      --outline: #2a2a2a;
+      --outline-soft: #313131;
+      --on-surface: #f5f5f5;
+      --on-surface-variant: #b0b0b0;
+      --primary: #25f4ee;
+      --accent-hot: #fe2c55;
+      --shadow-out: 0 12px 32px rgba(0, 0, 0, 0.45);
+      --shadow-in: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Roboto, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--on-surface);
+      background: radial-gradient(1200px 600px at 15% 0%, #1a1a1a 0%, var(--bg) 44%);
+      padding: clamp(12px, 2vw, 24px);
+    }
+
+    .layout {
+      width: min(1700px, calc(100vw - clamp(24px, 3vw, 40px)));
+      margin: 0 auto 0 0;
+      display: grid;
+      grid-template-columns: minmax(520px, 1.08fr) minmax(500px, 1.04fr) minmax(240px, 0.48fr);
+      gap: clamp(12px, 1.2vw, 20px);
+    }
+
+    .card {
+      border-radius: 18px;
+      background: linear-gradient(145deg, var(--surface), #101010);
+      border: 1px solid var(--outline);
+      box-shadow: var(--shadow-out);
+    }
+
+    .preview {
+      padding: 24px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 812px;
+    }
+
+    .phone-wrap {
+      width: 100%;
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+    }
+
+    .phone {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+      background: #040507;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-out);
+    }
+    .phone-shell {
+      position: relative;
+      display: inline-block;
+      width: 360px;
+      height: 800px;
+    }
+
+    .status-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 14px;
+      letter-spacing: 0.25px;
+      color: #fff;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25));
+      z-index: 5;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      opacity: 0.92;
+    }
+    .status-icon-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .status-icon-box {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .camera-rect {
+      position: absolute;
+      left: 0;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 30% 12%, rgba(255, 124, 159, 0.38), transparent 40%),
+        linear-gradient(180deg, #8a4e8d 0%, #d16074 40%, #6d3724 84%, #3c180f 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .camera-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      background: #111;
+    }
+
+    .camera-rect::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent 35%);
+      pointer-events: none;
+    }
+    .capture-circle {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .capture-circle svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .shoot-tab {
+      position: absolute;
+      left: 50%;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--shoot-tab-gap, 16px);
+      font-family: "TikTok Text", "PingFang SC", "SF Pro Text", "Segoe UI", sans-serif;
+      font-size: var(--shoot-tab-font-size, 14px);
+      font-weight: 500;
+      line-height: var(--shoot-tab-line-height, 18px);
+      letter-spacing: var(--shoot-tab-letter-spacing, 0.6653px);
+      color: #fff;
+      white-space: nowrap;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .shoot-tab-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--shoot-tab-line-height, 18px);
+    }
+    .shoot-tab-item-3m {
+      width: var(--shoot-tab-item-3m-width, 22px);
+    }
+    .shoot-tab-item-60s {
+      width: var(--shoot-tab-item-60s-width, 26px);
+    }
+    .shoot-tab-item-photo {
+      width: var(--shoot-tab-item-photo-width, 40px);
+    }
+    .shoot-tab-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--shoot-tab-pill-width, 38px);
+      height: var(--shoot-tab-pill-height, 26px);
+      border-radius: var(--shoot-tab-pill-radius, 20px);
+      background: #f1f1f1;
+      color: #000;
+      text-shadow: none;
+    }
+
+    .gap-tag {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--on-surface);
+      background: rgba(0, 0, 0, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      padding: 4px 8px;
+      z-index: 6;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .gap-outside {
+      width: 112px;
+      text-align: center;
+    }
+    .gap-left {
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .gap-right {
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .gap-bottom {
+      top: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: 132px;
+      text-align: center;
+    }
+    .bottom-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 24px;
+      background: transparent;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+    .bottom-bar::before {
+      content: "";
+      width: 108px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+    }
+    .right-tools {
+      position: absolute;
+      right: 0;
+      z-index: 6;
+      width: 56px;
+      height: 354px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0;
+      transform-origin: top right;
+      pointer-events: none;
+    }
+    .right-tool-item {
+      width: 56px;
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .right-tool-icon {
+      height: 28px;
+      width: auto;
+      display: block;
+    }
+    .right-tool-icon.icon-flip { width: 33.21px; }
+    .right-tool-icon.icon-off { width: 24.07px; }
+    .right-tool-icon.icon-timer { width: 28px; }
+    .right-tool-icon.icon-speed { width: 26.83px; }
+    .right-tool-icon.icon-filters { width: 29.91px; }
+    .right-tool-icon.icon-beautify { width: 26.8px; }
+    .right-tool-label {
+      font-size: 10px;
+      line-height: 1.3;
+      color: #fff;
+      letter-spacing: 0.23px;
+      text-align: center;
+      text-shadow: 0 1px 1px rgba(22, 24, 35, 0.2);
+      min-width: 56px;
+    }
+
+    .rule {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.4);
+      z-index: 4;
+    }
+
+    .rule-label {
+      position: absolute;
+      left: 16px;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #dbe7ff;
+      background: rgba(12, 16, 24, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      padding: 4px 8px;
+      z-index: 4;
+    }
+
+    .model-card {
+      width: 100%;
+      background: linear-gradient(145deg, var(--surface-2), #141414);
+      border: 1px solid var(--outline);
+      border-radius: 14px;
+      box-shadow: var(--shadow-in);
+      padding: 14px 16px;
+      color: var(--on-surface-variant);
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 132px;
+      max-height: 132px;
+      overflow: hidden;
+    }
+
+    .model-title {
+      color: var(--on-surface);
+      font-weight: 700;
+      font-size: 19px;
+      line-height: 24px;
+      margin-bottom: 8px;
+    }
+
+    .model-card a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .model-card a:hover { text-decoration: underline; }
+
+    .control {
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto auto 392px 132px;
+      gap: 16px;
+      align-content: start;
+    }
+    .control-head {
+      display: block;
+    }
+    .control-head-left {
+      min-width: 0;
+      flex: 1;
+    }
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .mode-card {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      min-height: 180px;
+    }
+    .bottom-gap-card {
+      min-height: 190px;
+    }
+    .mode-card-title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 22px;
+      color: var(--on-surface);
+      font-weight: 700;
+    }
+    .mode-card-desc {
+      margin: 0;
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--on-surface-variant);
+    }
+    .mode-switch-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mode-switch-note {
+      font-size: 11px;
+      line-height: 1.3;
+      color: var(--on-surface-variant);
+      white-space: nowrap;
+    }
+    .mode-switch-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      padding-top: 2px;
+    }
+    .mode-switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .mode-switch::before {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .mode-switch:checked {
+      background: rgba(37, 244, 238, 0.28);
+      border-color: rgba(37, 244, 238, 0.75);
+    }
+    .mode-switch:checked::before {
+      transform: translateX(20px);
+    }
+    .mode-switch-label {
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--on-surface-variant);
+      white-space: normal;
+      user-select: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 32px;
+      letter-spacing: 0.15px;
+      color: var(--on-surface);
+    }
+
+    .desc {
+      margin: 0;
+      color: var(--on-surface-variant);
+      font-size: 14px;
+      line-height: 21px;
+      margin-top: 6px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, 40px);
+      gap: 8px;
+      height: 136px;
+      min-height: 136px;
+      max-height: 136px;
+      overflow: hidden;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--outline);
+      background: var(--surface-2);
+      color: var(--on-surface-variant);
+      font-size: 12px;
+      line-height: 18px;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chip.range-chip {
+      grid-column: 1 / -1;
+    }
+
+    .chip strong { color: var(--on-surface); }
+
+    .slider-box {
+      margin-top: 0;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--outline);
+      background: linear-gradient(160deg, var(--surface-2), #131e30);
+      box-shadow: var(--shadow-in);
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-height: 392px;
+      max-height: 392px;
+      overflow: hidden;
+    }
+    .slider-group {
+      display: grid;
+      grid-template-rows: auto auto 88px;
+      align-content: start;
+    }
+    .slider-group.model-group {
+      grid-template-rows: auto auto 30px 28px;
+    }
+    .slider-group + .slider-group {
+      margin-top: 16px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--outline-soft);
+    }
+    .slider-title {
+      font-size: 12px;
+      color: var(--on-surface);
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+      font-size: 14px;
+      line-height: 18px;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      margin: 4px 0 20px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      padding: 0;
+      border: 0;
+      display: block;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #4a4a4a;
+      border: 1px solid #6a6a6a;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-top: -8px;
+      background: radial-gradient(circle at 30% 30%, #3dfff8, var(--primary));
+      border: 2px solid #111;
+      box-shadow: 0 0 0 3px rgba(37, 244, 238, 0.2);
+    }
+    input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #4a4a4a;
+      border: 1px solid #6a6a6a;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #3dfff8, var(--primary));
+      border: 2px solid #111;
+      box-shadow: 0 0 0 3px rgba(37, 244, 238, 0.2);
+    }
+    input[type="range"].model-range {
+      width: calc(100% - 32px);
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+    input[type="range"].range-main {
+      width: calc(100% - 32px);
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .ticks {
+      position: relative;
+      --count: 1;
+      height: 84px;
+      overflow: visible;
+    }
+    .ticks.range-ticks {
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .tick {
+      position: absolute;
+      top: 0;
+      text-align: center;
+      padding-top: 20px;
+      font-size: 9px;
+      line-height: 1.28;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      user-select: none;
+      transform: translateX(-50%);
+      min-width: 0;
+      width: max-content;
+      white-space: nowrap;
+    }
+
+    .tick::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #60708a;
+      border: 2px solid #1b2232;
+    }
+
+    .tick.active {
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .tick.active::before {
+      background: var(--primary);
+      box-shadow: 0 0 0 6px rgba(37, 244, 238, 0.18);
+    }
+    .ticks.model-ticks {
+      height: 30px;
+      overflow: visible;
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+    .model-ticks .tick {
+      min-width: 0;
+      width: 0;
+      padding-top: 0;
+      font-size: 0;
+      line-height: 0;
+    }
+    .model-ticks .tick::before {
+      top: 12px;
+    }
+    .model-ticks.common-selected .tick.active::before {
+      background: #fe2c55;
+      box-shadow: 0 0 0 6px rgba(254, 44, 85, 0.2);
+    }
+    .model-current {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .formula {
+      margin-top: 8px;
+      color: var(--on-surface-variant);
+      font-size: 13px;
+      line-height: 20px;
+      align-self: end;
+    }
+
+    .formula code {
+      background: #1f1f1f;
+      border: 1px solid #353535;
+      border-radius: 6px;
+      padding: 1px 6px;
+      color: var(--on-surface);
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .side-panel {
+        order: 3;
+      }
+      .preview { min-height: 680px; }
+      .control {
+        grid-template-rows: auto auto auto auto;
+      }
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(3, 42px);
+        height: 142px;
+        min-height: 142px;
+        max-height: 142px;
+      }
+      .slider-box {
+        min-height: 420px;
+        max-height: none;
+      }
+      .model-card {
+        min-height: 132px;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="card preview">
+      <div class="phone-wrap">
+        <div id="phoneShell" class="phone-shell">
+          <div id="phone" class="phone">
+            <div id="statusBar" class="status-bar">
+              <span>8:00</span>
+              <span class="status-icons">
+                <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/10ed6d06-c0b9-4a92-ad7a-341690085a04" alt="" /></span>
+                <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/355047d8-0bd7-4035-87b9-5fc8c278c8b5" alt="" /></span>
+                <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/683dc837-e14e-4a09-8e08-be31b80d7a1b" alt="" /></span>
+              </span>
+            </div>
+
+            <div id="cameraRect" class="camera-rect">
+              <video
+                id="cameraVideo"
+                class="camera-video"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="auto"
+              >
+                <source src="/Users/bytedance/Downloads/Test Video.mp4" type="video/mp4" />
+              </video>
+            <div id="shootTab" class="shoot-tab" aria-hidden="true">
+              <span class="shoot-tab-item shoot-tab-item-3m">3m</span>
+              <span class="shoot-tab-item shoot-tab-item-60s">60s</span>
+              <span id="shootTabCenter" class="shoot-tab-pill shoot-tab-item">15s</span>
+              <span class="shoot-tab-item shoot-tab-item-photo">Photo</span>
+            </div>
+            <div id="captureCircle" class="capture-circle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="102" height="102" viewBox="0 0 102 102" fill="none">
+                <g filter="url(#filter0_d_2_171)">
+                  <circle cx="51" cy="49" r="41.5" stroke="white" stroke-width="3"/>
+                  <circle cx="51" cy="49" r="37" fill="#FE2C55"/>
+                </g>
+                <defs>
+                  <filter id="filter0_d_2_171" x="0" y="0" width="102" height="102" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                    <feOffset dy="2"/>
+                    <feGaussianBlur stdDeviation="4"/>
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0"/>
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_171"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_171" result="shape"/>
+                  </filter>
+                </defs>
+              </svg>
+            </div>
+            </div>
+          <div id="rightTools" class="right-tools" aria-hidden="true">
+            <div class="right-tool-item">
+              <img class="right-tool-icon icon-flip" src="https://www.figma.com/api/mcp/asset/ba5f9515-c507-4439-8aa8-00592cc89711" alt="" />
+              <div class="right-tool-label">Flip</div>
+            </div>
+            <div class="right-tool-item">
+              <img class="right-tool-icon icon-off" src="https://www.figma.com/api/mcp/asset/c2b5f5fe-275c-43d6-b2f3-ef84a097bf32" alt="" />
+              <div class="right-tool-label">Off</div>
+            </div>
+            <div class="right-tool-item">
+              <img class="right-tool-icon icon-timer" src="https://www.figma.com/api/mcp/asset/6fd37300-cfe0-47fa-af10-75f269131494" alt="" />
+              <div class="right-tool-label">Timer</div>
+            </div>
+            <div class="right-tool-item">
+              <img class="right-tool-icon icon-speed" src="https://www.figma.com/api/mcp/asset/47321161-0369-4e09-ae33-5219cd4df744" alt="" />
+              <div class="right-tool-label">Speed</div>
+            </div>
+            <div class="right-tool-item">
+              <img class="right-tool-icon icon-filters" src="https://www.figma.com/api/mcp/asset/319baa3f-8eba-49e5-84e3-3426e9a5ba16" alt="" />
+              <div class="right-tool-label">Filters</div>
+            </div>
+            <div class="right-tool-item">
+              <img class="right-tool-icon icon-beautify" src="https://www.figma.com/api/mcp/asset/41a77c2a-c6fe-4a68-9b61-14c2cab318bd" alt="" />
+              <div class="right-tool-label">Beautify</div>
+            </div>
+          </div>
+            <div id="bottomBar" class="bottom-bar"></div>
+          </div>
+        </div>
+        <div id="gapLeftTag" class="gap-tag gap-left gap-outside" hidden>左间距 0px</div>
+        <div id="gapRightTag" class="gap-tag gap-right gap-outside" hidden>右间距 0px</div>
+        <div id="gapBottomTag" class="gap-tag gap-bottom gap-outside" hidden>距底部Bar 0px</div>
+
+      </div>
+    </section>
+
+    <section class="card control">
+      <div class="control-head">
+        <div class="control-head-left">
+          <h1>Android 拍摄画幅适配</h1>
+          <p class="desc">
+            统一验证不同安卓尺寸下的 <strong>9:16</strong> 画幅位置与边距关系，确保画幅不越界并满足顶部、底部系统区域约束。
+          </p>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <span class="chip">机型总数：<strong id="totalModelsText">-</strong></span>
+        <span class="chip">机型尺寸：<strong id="sizeText">-</strong></span>
+        <span class="chip">屏幕比例：<strong id="ratioText">-</strong></span>
+        <span class="chip">矩形尺寸：<strong id="rectSizeText">-</strong></span>
+        <span class="chip">左右间距：<strong id="sideGapText">-</strong></span>
+        <span class="chip">距底部Bar：<strong id="bottomGapText">-</strong></span>
+        <span class="chip range-chip">当前区间：<strong id="rangeText">-</strong></span>
+      </div>
+
+      <div class="slider-box">
+        <div class="slider-group">
+          <div class="slider-title">尺寸区间</div>
+          <input id="rangeSlider" class="range-main" type="range" />
+          <div id="rangeTicks" class="ticks range-ticks"></div>
+        </div>
+        <div class="slider-group model-group">
+          <div class="slider-title">区间内机型</div>
+          <input id="modelSlider" class="model-range" type="range" />
+          <div id="modelTicks" class="ticks model-ticks"></div>
+          <div id="modelCurrent" class="model-current">当前机型：-</div>
+        </div>
+        <p class="formula">
+          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">88px</code>，
+          <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
+        </p>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title" id="modelTitle">-</div>
+        <div id="modelSpec">-</div>
+        <div id="modelLinkWrap"></div>
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <section class="card mode-card">
+        <h3 class="mode-card-title">适配模式</h3>
+        <p class="mode-card-desc">
+          自适应模式会根据机型尺寸动态调整侧边工具栏、拍摄按钮和 Shoot Tab。固定大小模式会锁定为 360×800 的基准视觉尺寸。
+        </p>
+        <div class="mode-switch-row">
+          <input id="modeSwitch" class="mode-switch" type="checkbox" aria-label="切换控件适配模式" checked />
+          <span class="mode-switch-note">开：自适应 / 关：固定大小</span>
+        </div>
+        <span id="modeSwitchLabel" class="mode-switch-label">当前状态：自适应</span>
+      </section>
+      <section class="card mode-card bottom-gap-card">
+        <h3 class="mode-card-title">适配底部面板</h3>
+        <p class="mode-card-desc">
+          控制画幅与系统底部条之间的最小保留空间。基准值为 360×800 下 88px：固定大小模式保持 88px，自适应模式按尺寸比例换算。
+        </p>
+        <div class="mode-switch-row">
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部88px约束" checked />
+          <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
+        </div>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label">当前状态：启用 · 保留 88px</span>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const RAW_MODELS = [
+      { name: "Galaxy Ace 4", width: 320, height: 533, official: "https://www.gsmarena.com/samsung_galaxy_ace_4-6439.php" },
+      { name: "Xperia E3", width: 320, height: 533, official: "https://www.gsmarena.com/sony_xperia_e3-6600.php" },
+      { name: "Moto E (2015)", width: 360, height: 640, official: "https://www.gsmarena.com/motorola_moto_e_(2nd_gen)-6986.php" },
+      { name: "Galaxy J2", width: 360, height: 640, official: "https://www.gsmarena.com/samsung_galaxy_j2-7437.php" },
+      { name: "Nokia 8", width: 360, height: 720, official: "https://www.gsmarena.com/nokia_8-8522.php" },
+      { name: "OnePlus 5", width: 360, height: 720, official: "https://www.gsmarena.com/oneplus_5-8647.php" },
+      { name: "Galaxy S8", width: 360, height: 740, official: "https://www.gsmarena.com/samsung_galaxy_s8-8161.php" },
+      { name: "Galaxy S9", width: 360, height: 740, official: "https://www.gsmarena.com/samsung_galaxy_s9-8966.php" },
+      { name: "Galaxy Note9", width: 360, height: 740, official: "https://www.gsmarena.com/samsung_galaxy_note9-9163.php" },
+      { name: "Galaxy S10", width: 360, height: 760, official: "https://www.gsmarena.com/samsung_galaxy_s10-9536.php" },
+      { name: "Galaxy S23", width: 360, height: 780, official: "https://www.gsmarena.com/samsung_galaxy_s23-12082.php" },
+      { name: "Galaxy S24", width: 360, height: 780, official: "https://www.gsmarena.com/samsung_galaxy_s24-12773.php" },
+      { name: "Galaxy S21", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s21_5g-10626.php" },
+      { name: "Galaxy S22", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s22_5g-11253.php" },
+      { name: "Galaxy S25", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s25-13610.php" },
+      { name: "Galaxy S21 Ultra", width: 384, height: 854, official: "https://www.gsmarena.com/samsung_galaxy_s21_ultra_5g-10596.php" },
+      { name: "Galaxy S22 Ultra", width: 384, height: 854, official: "https://www.gsmarena.com/samsung_galaxy_s22_ultra_5g-11251.php" },
+      { name: "Galaxy S24+", width: 384, height: 854, official: "https://www.gsmarena.com/samsung_galaxy_s24+-12772.php" },
+      { name: "Pixel 3", width: 393, height: 786, official: "https://www.gsmarena.com/google_pixel_3-9256.php" },
+      { name: "Pixel 3a", width: 393, height: 808, official: "https://www.gsmarena.com/google_pixel_3a-9408.php" },
+      { name: "Pixel 4", width: 393, height: 830, official: "https://www.gsmarena.com/google_pixel_4-9896.php" },
+      { name: "Pixel 4a", width: 393, height: 851, official: "https://www.gsmarena.com/google_pixel_4a-10123.php" },
+      { name: "Pixel 5", width: 393, height: 851, official: "https://www.gsmarena.com/google_pixel_5-10386.php" },
+      { name: "Xiaomi Redmi Note 9 Pro", width: 393, height: 873, official: "https://www.gsmarena.com/xiaomi_redmi_note_9_pro-10217.php" },
+      { name: "Xiaomi 13", width: 393, height: 873, official: "https://www.gsmarena.com/xiaomi_13-12013.php" },
+      { name: "Galaxy S20+", width: 412, height: 869, official: "https://www.gsmarena.com/samsung_galaxy_s20+-10041.php" },
+      { name: "Galaxy Note20 Ultra", width: 412, height: 883, official: "https://www.gsmarena.com/samsung_galaxy_note20_ultra_5g-10261.php" },
+      { name: "Galaxy S25 Ultra", width: 412, height: 891, official: "https://www.gsmarena.com/samsung_galaxy_s25_ultra-13611.php" },
+      { name: "OnePlus 8 Pro", width: 412, height: 906, official: "https://www.gsmarena.com/oneplus_8_pro-9919.php" },
+      { name: "OnePlus 8T", width: 412, height: 914, official: "https://www.gsmarena.com/oneplus_8t-10420.php" },
+      { name: "Pixel 7", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_7-11903.php" },
+      { name: "Pixel 7 Pro", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_7_pro-11908.php" },
+      { name: "Pixel 8", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_8-12546.php" },
+      { name: "Pixel 9", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_9-13219.php" },
+      { name: "Xiaomi 14", width: 412, height: 915, official: "https://www.gsmarena.com/xiaomi_14-12626.php" },
+      { name: "OnePlus 12", width: 412, height: 918, official: "https://www.gsmarena.com/oneplus_12-12725.php" },
+      { name: "Pixel 8 Pro", width: 430, height: 932, official: "https://www.gsmarena.com/google_pixel_8_pro-12545.php" },
+      { name: "Pixel 9 Pro XL", width: 430, height: 932, official: "https://www.gsmarena.com/google_pixel_9_pro_xl-13217.php" },
+      { name: "Tecno Spark Go 2024", width: 431, height: 966, official: "https://www.gsmarena.com/tecno_spark_go_2024-12704.php" },
+      { name: "Xiaomi Redmi 9A", width: 429, height: 952, official: "https://www.gsmarena.com/xiaomi_redmi_9a-10279.php" },
+      { name: "Samsung Galaxy A03 Core", width: 426, height: 947, official: "https://www.gsmarena.com/samsung_galaxy_a03_core-11275.php" },
+      { name: "Samsung Galaxy A05", width: 440, height: 977, official: "https://www.gsmarena.com/samsung_galaxy_a05-12583.php" },
+      { name: "Samsung Galaxy A15", width: 436, height: 992, official: "https://www.gsmarena.com/samsung_galaxy_a15-12637.php" },
+      { name: "Infinix Smart 5", width: 433, height: 964, official: "https://www.gsmarena.com/infinix_smart_5-10612.php" },
+      { name: "Samsung Galaxy A10s", width: 426, height: 897, official: "https://www.gsmarena.com/samsung_galaxy_a10s-9798.php" },
+      { name: "Tecno Spark 30C", width: 438, height: 974, official: "https://www.gsmarena.com/tecno_spark_30c-13361.php" },
+      { name: "Infinix Hot 40i", width: 429, height: 960, official: "https://www.gsmarena.com/infinix_hot_40i-12733.php" },
+      { name: "ROG Phone 8 Pro", width: 450, height: 1000, official: "https://www.gsmarena.com/asus_rog_phone_8_pro-12729.php" },
+      { name: "Sony Xperia 1 V", width: 450, height: 1000, official: "https://www.gsmarena.com/sony_xperia_1_v-12263.php" },
+      
+    ];
+
+    const COMMON_MODEL_PRIORITY = [
+      "Galaxy S",
+      "Galaxy Note",
+      "Pixel",
+      "Xiaomi",
+      "Redmi",
+      "OnePlus",
+      "Sony Xperia",
+      "ROG",
+      "Nokia",
+      "Moto",
+      "Tecno",
+      "Infinix",
+      "Oppo",
+      "itel",
+      "Xperia "
+    ];
+
+    function scoreCommonModel(name) {
+      const idx = COMMON_MODEL_PRIORITY.findIndex((key) => name.includes(key));
+      return idx === -1 ? 999 : idx;
+    }
+
+    function dedupeBySizeKeepCommon(models) {
+      const bySize = new Map();
+      models.forEach((m) => {
+        const key = `${m.width}x${m.height}`;
+        const current = bySize.get(key);
+        if (!current) {
+          bySize.set(key, m);
+          return;
+        }
+        const currentScore = scoreCommonModel(current.name);
+        const nextScore = scoreCommonModel(m.name);
+        if (nextScore < currentScore) {
+          bySize.set(key, m);
+        }
+      });
+      return [...bySize.values()];
+    }
+
+    const MODELS = dedupeBySizeKeepCommon(RAW_MODELS).map((item) => ({
+      ...item,
+      statusBarHeight: item.height >= 930 ? 46 : item.height >= 880 ? 44 : item.height >= 760 ? 42 : 40
+    }));
+
+    const rangeSlider = document.getElementById("rangeSlider");
+    const modelSlider = document.getElementById("modelSlider");
+    const rangeTicks = document.getElementById("rangeTicks");
+    const modelTicks = document.getElementById("modelTicks");
+    const modelCurrent = document.getElementById("modelCurrent");
+    const phoneShell = document.getElementById("phoneShell");
+    const phone = document.getElementById("phone");
+    const statusBar = document.getElementById("statusBar");
+    const cameraRect = document.getElementById("cameraRect");
+    const rightTools = document.getElementById("rightTools");
+    const cameraVideo = document.getElementById("cameraVideo");
+    const captureCircle = document.getElementById("captureCircle");
+    const shootTab = document.getElementById("shootTab");
+    const shootTabCenter = document.getElementById("shootTabCenter");
+    const modeSwitch = document.getElementById("modeSwitch");
+    const modeSwitchLabel = document.getElementById("modeSwitchLabel");
+    const bottomGapSwitch = document.getElementById("bottomGapSwitch");
+    const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
+    const bottomGapRuleText = document.getElementById("bottomGapRuleText");
+    const bottomBar = document.getElementById("bottomBar");
+    const gapLeftTag = document.getElementById("gapLeftTag");
+    const gapRightTag = document.getElementById("gapRightTag");
+    const gapBottomTag = document.getElementById("gapBottomTag");
+
+    const totalModelsText = document.getElementById("totalModelsText");
+    const rangeText = document.getElementById("rangeText");
+    const sizeText = document.getElementById("sizeText");
+    const ratioText = document.getElementById("ratioText");
+    const rectSizeText = document.getElementById("rectSizeText");
+    const sideGapText = document.getElementById("sideGapText");
+    const bottomGapText = document.getElementById("bottomGapText");
+    const modelTitle = document.getElementById("modelTitle");
+    const modelSpec = document.getElementById("modelSpec");
+    const modelLinkWrap = document.getElementById("modelLinkWrap");
+
+    const RANGE_DEFS = [
+      { key: "small", label: "小屏", helper: "h ≤ 640", match: (m) => m.height <= 640 },
+      { key: "standard", label: "标准屏", helper: "641-800", match: (m) => m.height >= 641 && m.height <= 800 },
+      { key: "midLarge", label: "中大屏", helper: "801-900", match: (m) => m.height >= 801 && m.height <= 900 && m.width < 500 },
+      { key: "large", label: "大屏", helper: "≥ 901", match: (m) => m.height >= 901 && m.width < 500 }
+    ];
+
+    const RANGE_BUCKETS = RANGE_DEFS
+      .map((def) => {
+        const models = MODELS
+          .filter(def.match)
+          .sort((a, b) => a.height - b.height || a.width - b.width || a.name.localeCompare(b.name));
+
+        if (models.length === 0) {
+          return null;
+        }
+
+        const heights = models.map((m) => m.height);
+        const widths = models.map((m) => m.width);
+        return {
+          key: def.key,
+          label: def.label,
+          helper: def.helper,
+          minH: Math.min(...heights),
+          maxH: Math.max(...heights),
+          minW: Math.min(...widths),
+          maxW: Math.max(...widths),
+          models
+        };
+      })
+      .filter(Boolean);
+
+    // Top20 common models from provided reference table (size-level dedupe safe).
+    const TOP20_COMMON_SIZES = new Set([
+      "431x966",
+      "429x952",
+      "426x947",
+      "440x977",
+      "436x992",
+      "433x964",
+      "426x897",
+      "438x974",
+      "429x960"
+    ]);
+
+    let currentModelsInRange = [];
+    let lastSelectionKey = "";
+
+    rangeSlider.min = "0";
+    rangeSlider.max = String(RANGE_BUCKETS.length - 1);
+    rangeSlider.step = "1";
+    rangeSlider.value = "1";
+
+    function setupRangeTicks() {
+      rangeTicks.innerHTML = "";
+      rangeTicks.style.setProperty("--count", String(RANGE_BUCKETS.length));
+      RANGE_BUCKETS.forEach((bucket, i) => {
+        const last = RANGE_BUCKETS.length - 1;
+        const edgePercent = 2;
+        const percent = last > 0 ? edgePercent + (i / last) * (100 - edgePercent * 2) : 50;
+        const el = document.createElement("div");
+        el.className = "tick";
+        el.style.left = `${percent}%`;
+        el.innerHTML = `${bucket.label}<br>${bucket.helper}`;
+        el.addEventListener("click", () => {
+          rangeSlider.value = String(i);
+          syncModelSliderByRange();
+          render();
+        });
+        rangeTicks.appendChild(el);
+      });
+    }
+
+    function syncModelSliderByRange() {
+      const rangeIndex = Number(rangeSlider.value);
+      currentModelsInRange = RANGE_BUCKETS[rangeIndex].models;
+
+      modelSlider.min = "0";
+      modelSlider.max = String(currentModelsInRange.length - 1);
+      modelSlider.step = "1";
+      modelSlider.value = "0";
+
+      modelTicks.innerHTML = "";
+      modelTicks.style.setProperty("--count", String(currentModelsInRange.length));
+      currentModelsInRange.forEach((m, i) => {
+        const last = currentModelsInRange.length - 1;
+        // Keep small edge padding so first/last dots are never clipped.
+        const edgePercent = 2;
+        const percent = last > 0 ? edgePercent + (i / last) * (100 - edgePercent * 2) : 50;
+        const el = document.createElement("div");
+        el.className = "tick";
+        el.style.left = `${percent}%`;
+        el.innerHTML = `${m.width}×${m.height}<br>${m.name}`;
+        el.addEventListener("click", () => {
+          modelSlider.value = String(i);
+          render();
+        });
+        modelTicks.appendChild(el);
+      });
+    }
+
+    function gcd(a, b) {
+      let x = a;
+      let y = b;
+      while (y !== 0) {
+        const t = y;
+        y = x % y;
+        x = t;
+      }
+      return x;
+    }
+
+    function approximateRatio(width, height) {
+      const target = width / height;
+      let bestA = 1;
+      let bestB = 1;
+      let bestErr = Infinity;
+
+      // Keep ratio labels short (1-2 digits), e.g. 9:20, 6:10.
+      for (let b = 1; b <= 20; b += 1) {
+        for (let a = 1; a <= 20; a += 1) {
+          const err = Math.abs(a / b - target);
+          if (err < bestErr) {
+            bestErr = err;
+            bestA = a;
+            bestB = b;
+          }
+        }
+      }
+
+      return `${bestA}:${bestB}`;
+    }
+
+    function render() {
+      const rangeIndex = Number(rangeSlider.value);
+      const modelIndex = Number(modelSlider.value);
+      const bucket = RANGE_BUCKETS[rangeIndex];
+      const m = currentModelsInRange[Math.min(modelIndex, currentModelsInRange.length - 1)];
+      const selectionKey = `${rangeIndex}-${modelIndex}`;
+      const isAdaptiveMode = modeSwitch.checked;
+      modeSwitchLabel.textContent = `当前状态：${isAdaptiveMode ? "自适应" : "固定大小"}`;
+
+      const stageWidth = 360;
+      const stageHeight = 800;
+      const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
+      phone.style.width = `${m.width}px`;
+      phone.style.height = `${m.height}px`;
+      phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+      statusBar.style.height = `${m.statusBarHeight}px`;
+      const bottomBarHeight = 24;
+      bottomBar.style.height = `${bottomBarHeight}px`;
+      const enforceBottomGap = bottomGapSwitch.checked;
+      const baseBottomGap = 88;
+      const adaptiveGapScale = Math.min(m.width / 360, m.height / 800);
+      const minGapToBottomBar = enforceBottomGap
+        ? (isAdaptiveMode ? Math.round(baseBottomGap * adaptiveGapScale) : baseBottomGap)
+        : 0;
+      bottomGapSwitchLabel.textContent = enforceBottomGap
+        ? `当前状态：启用 · 保留 ${minGapToBottomBar}px`
+        : "当前状态：关闭 · 保留 0px";
+      bottomGapRuleText.textContent = `${minGapToBottomBar}px`;
+
+      const top = m.statusBarHeight;
+      const bottomBarTop = m.height - bottomBarHeight;
+      const availableHeight = bottomBarTop - minGapToBottomBar - top;
+
+      let rectW = m.width;
+      let rectH = Math.round(rectW * 16 / 9);
+      if (rectH > availableHeight) {
+        rectH = availableHeight;
+        rectW = Math.floor(rectH * 9 / 16);
+      }
+
+      const rectX = Math.floor((m.width - rectW) / 2);
+      cameraRect.style.left = `${rectX}px`;
+      cameraRect.style.top = `${top}px`;
+      cameraRect.style.width = `${rectW}px`;
+      cameraRect.style.height = `${rectH}px`;
+      const frameScale = rectW / 360;
+      const minAdaptiveControlScale = 0.82;
+      const fixedModeCompensationScale = 1 / scale;
+      // Right toolbar scales from 56x354 at 360x800 baseline.
+      const uiScale = isAdaptiveMode
+        ? Math.max(minAdaptiveControlScale, Math.min(m.width / 360, m.height / 800))
+        : fixedModeCompensationScale;
+      rightTools.style.top = `${top + Math.round(16 * uiScale)}px`;
+      rightTools.style.width = "56px";
+      rightTools.style.height = "354px";
+      rightTools.style.transform = `scale(${uiScale})`;
+      const captureScale = isAdaptiveMode
+        ? Math.max(minAdaptiveControlScale, frameScale)
+        : fixedModeCompensationScale;
+      const circleSize = Math.round(102 * captureScale);
+      const circleBottomInset = Math.round(24 * captureScale);
+      captureCircle.style.width = `${circleSize}px`;
+      captureCircle.style.height = `${circleSize}px`;
+      captureCircle.style.bottom = `${circleBottomInset}px`;
+      const tabScale = isAdaptiveMode
+        ? Math.max(minAdaptiveControlScale, frameScale)
+        : fixedModeCompensationScale;
+      const tabGap = Math.max(8, 16 * tabScale);
+      const tabFontSize = Math.max(9, 14 * tabScale);
+      const tabLineHeight = Math.max(11, 18 * tabScale);
+      const tabLetterSpacing = 0.6652911901473999 * tabScale;
+      const tabPillWidth = Math.max(24, 38 * tabScale);
+      const tabPillHeight = Math.max(16, 26 * tabScale);
+      const tabPillRadius = Math.max(12, 20 * tabScale);
+      const tab3mWidth = Math.max(14, 22 * tabScale);
+      const tab60sWidth = Math.max(16, 26 * tabScale);
+      const tabPhotoWidth = Math.max(24, 40 * tabScale);
+      const tabBottomToButton = Math.max(8, Math.round(16 * tabScale));
+      shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}px`);
+      shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}px`);
+      shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}px`);
+      shootTab.style.setProperty("--shoot-tab-letter-spacing", `${tabLetterSpacing}px`);
+      shootTab.style.setProperty("--shoot-tab-pill-width", `${tabPillWidth}px`);
+      shootTab.style.setProperty("--shoot-tab-pill-height", `${tabPillHeight}px`);
+      shootTab.style.setProperty("--shoot-tab-pill-radius", `${tabPillRadius}px`);
+      shootTab.style.setProperty("--shoot-tab-item-3m-width", `${tab3mWidth}px`);
+      shootTab.style.setProperty("--shoot-tab-item-60s-width", `${tab60sWidth}px`);
+      shootTab.style.setProperty("--shoot-tab-item-photo-width", `${tabPhotoWidth}px`);
+      shootTab.style.bottom = `${circleBottomInset + circleSize + tabBottomToButton}px`;
+      const pillCenterX = shootTabCenter.offsetLeft + shootTabCenter.offsetWidth / 2;
+      shootTab.style.transform = `translateX(${-pillCenterX}px)`;
+      const sideGap = Math.max(0, rectX);
+      const bottomGap = Math.max(0, bottomBarTop - (top + rectH));
+      const isCommonModel = TOP20_COMMON_SIZES.has(`${m.width}x${m.height}`);
+      modelTicks.classList.toggle("common-selected", isCommonModel);
+
+      if (sideGap > 0) {
+        gapLeftTag.hidden = false;
+        gapRightTag.hidden = false;
+        gapLeftTag.textContent = `左间距 ${sideGap}px`;
+        gapRightTag.textContent = `右间距 ${sideGap}px`;
+      } else {
+        gapLeftTag.hidden = true;
+        gapRightTag.hidden = true;
+      }
+      if (bottomGap > 0) {
+        gapBottomTag.hidden = false;
+        gapBottomTag.textContent = `距底部Bar ${bottomGap}px`;
+      } else {
+        gapBottomTag.hidden = true;
+      }
+
+      const ratio = `≈ ${approximateRatio(m.width, m.height)}`;
+      totalModelsText.textContent = `${MODELS.length}`;
+      rangeText.textContent = `${bucket.label} (${bucket.helper}) · ${bucket.minW}×${bucket.minH} ~ ${bucket.maxW}×${bucket.maxH}（${bucket.models.length}台）`;
+      sizeText.textContent = `${m.width}×${m.height} px`;
+      ratioText.textContent = ratio;
+      rectSizeText.textContent = `${rectW}×${rectH} px`;
+      sideGapText.textContent = sideGap > 0 ? `${sideGap}px / ${sideGap}px` : "无";
+      bottomGapText.textContent = `${bottomGap}px`;
+      modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
+
+      modelTitle.textContent = m.name;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}px · 画幅顶部：${top}px · 系统底部指示条：${bottomBarHeight}px · 距底部系统条：${bottomGap}px（最低 ${minGapToBottomBar}px）`;
+      modelLinkWrap.innerHTML = "";
+
+      // Restart video from the beginning whenever size/model selection changes.
+      if (selectionKey !== lastSelectionKey) {
+        lastSelectionKey = selectionKey;
+        if (cameraVideo) {
+          try {
+            cameraVideo.currentTime = 0;
+            const p = cameraVideo.play();
+            if (p && typeof p.catch === "function") {
+              p.catch(() => {});
+            }
+          } catch (_) {
+            // Ignore playback reset errors in strict autoplay environments.
+          }
+        }
+      }
+
+      [...rangeTicks.children].forEach((t, i) => t.classList.toggle("active", i === rangeIndex));
+      [...modelTicks.children].forEach((t, i) => t.classList.toggle("active", i === modelIndex));
+    }
+
+    rangeSlider.addEventListener("input", () => {
+      syncModelSliderByRange();
+      render();
+    });
+    modelSlider.addEventListener("input", render);
+    modeSwitch.addEventListener("input", render);
+    bottomGapSwitch.addEventListener("input", render);
+
+    setupRangeTicks();
+    syncModelSliderByRange();
+    render();
+  </script>
+</body>
+</html>
