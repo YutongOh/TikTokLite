@@ -1395,7 +1395,7 @@
         <h3 class="mode-card-title">V1 新增圆角&居中画幅</h3>
         <div class="mode-switch-row">
           <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与居中画幅" />
-          <span class="mode-switch-note">开：仅屏幕内可见画幅圆角 20dp（超出部分先裁切再圆角）+ 画幅居中 / 关：无圆角不居中</span>
+          <span class="mode-switch-note">开：圆角 20dp + 画幅居中 / 关：无圆角不居中</span>
         </div>
         <div class="mode-switch-row">
           <input id="toolbarFollowFrameSwitch" class="mode-switch" type="checkbox" aria-label="切换工具栏是否跟随画幅顶部" />
@@ -1818,8 +1818,10 @@
       const frameStyleOn = frameStyleSwitch.checked;
       const frameTopOffset = frameStyleOn ? Math.max(0, Math.round((availableHeight - rectH) / 2)) : 0;
       const frameTop = topBase + frameTopOffset;
+      const frameRadiusPx = frameStyleOn ? 20 : 0;
+      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 屏幕内圆角 20dp（先裁切后圆角）· 画幅居中"
+        ? "当前状态：开启 · 圆角 20dp · 画幅居中"
         : "当前状态：关闭 · 无圆角 · 不居中";
       const toolbarFollowFrameOn = toolbarFollowFrameSwitch.checked;
       toolbarFollowFrameSwitchLabel.textContent = toolbarFollowFrameOn
@@ -1831,21 +1833,6 @@
       cameraRect.style.top = `${frameTop}px`;
       cameraRect.style.width = `${rectW}px`;
       cameraRect.style.height = `${rectH}px`;
-      {
-        const frameRadiusDp = 20;
-        const frameRadiusPx = frameStyleOn ? frameRadiusDp : 0;
-        if (frameStyleOn && frameRadiusPx > 0) {
-          const topInset = Math.max(0, -frameTop);
-          const rightInset = Math.max(0, rectX + rectW - m.width);
-          const bottomInset = Math.max(0, frameTop + rectH - m.height);
-          const leftInset = Math.max(0, -rectX);
-          cameraRect.style.borderRadius = "0";
-          cameraRect.style.clipPath = `inset(${topInset}px ${rightInset}px ${bottomInset}px ${leftInset}px round ${frameRadiusPx}px)`;
-        } else {
-          cameraRect.style.clipPath = "none";
-          cameraRect.style.borderRadius = "0";
-        }
-      }
       const fixedModeCompensationScale = 1 / scale;
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
