@@ -801,7 +801,7 @@
     .slider-box input[type="range"].range-main::-webkit-slider-runnable-track {
       height: 24px;
       border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.28);
+      border: 0;
       background:
         linear-gradient(
           90deg,
@@ -810,7 +810,10 @@
           rgba(236, 72, 153, 0.76) 100%
         ) 0 0 / var(--range-progress) 100% no-repeat,
         linear-gradient(90deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.11));
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+        inset 0 1px 2px rgba(255, 255, 255, 0.08),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.35);
     }
     .slider-box input[type="range"].range-main::-webkit-slider-thumb {
       width: 8px;
@@ -824,7 +827,7 @@
     .slider-box input[type="range"].range-main::-moz-range-track {
       height: 24px;
       border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.28);
+      border: 0;
       background:
         linear-gradient(
           90deg,
@@ -833,7 +836,10 @@
           rgba(236, 72, 153, 0.76) 100%
         ) 0 0 / var(--range-progress) 100% no-repeat,
         linear-gradient(90deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.11));
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+        inset 0 1px 2px rgba(255, 255, 255, 0.08),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.35);
     }
     .slider-box input[type="range"].range-main::-moz-range-thumb {
       width: 8px;
