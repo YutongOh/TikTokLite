@@ -1604,19 +1604,13 @@
       captureScale = fixedModeCompensationScale;
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
-      const fullWidthFrameH = Math.round(m.width * 16 / 9);
-      const hasVerticalCropInCoverWidth = frameFitMode === "cover-width" && fullWidthFrameH > availableHeight;
+      const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
+      const hasBottomBlackBar = bottomGap > 0;
       // 拍摄按钮距离规则：
-      // 1. 撑满宽度且发生裁剪（无底部黑边）时，容器底边距系统 bar 顶部 40dp
-      // 2. 撑满宽度且不裁剪（有底部黑边）时，容器底边距系统 bar 顶部 89dp
-      // 3. 撑满高度时，维持距画幅 32dp 的既有规则
-      // 4. 其他情况维持 12dp
-      const circleBottomInset =
-        frameFitMode === "cover-width"
-          ? bottomBarHeight + (hasVerticalCropInCoverWidth ? 40 : 89)
-          : frameFitMode === "cover-height"
-            ? 32
-            : 12;
+      // 统一按实际是否存在底部黑边判断：
+      // 1. 有底部黑边时，容器底边距系统 bar 顶部 89dp
+      // 2. 无底部黑边时，容器底边距系统 bar 顶部 40dp
+      const circleBottomInset = bottomBarHeight + (hasBottomBlackBar ? 89 : 40);
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
@@ -1646,7 +1640,6 @@
       const pillCenterX = shootTabCenter.offsetLeft + shootTabCenter.offsetWidth / 2;
       shootTab.style.transform = `translateX(${-pillCenterX}px)`;
       const sideGap = Math.max(0, rectX);
-      const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
       const isCommonModel = TOP20_COMMON_SIZES.has(`${m.width}x${m.height}`);
       modelTicks.classList.toggle("common-selected", isCommonModel);
 
