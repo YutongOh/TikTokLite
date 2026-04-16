@@ -382,6 +382,31 @@
     .bottom-gap-card {
       min-height: 190px;
     }
+    .frame-style-card {
+      min-height: 320px;
+    }
+    .frame-offset-slider-block {
+      display: grid;
+      gap: 4px;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--outline-soft);
+    }
+    .frame-offset-slider-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--on-surface-variant);
+    }
+    #frameOffsetSliderValue {
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+    }
+    .frame-offset-slider-block input[type="range"] {
+      margin: 2px 0 0;
+    }
     .mode-card-title {
       margin: 0;
       font-size: 16px;
@@ -860,13 +885,34 @@
       <section class="card mode-card frame-style-card">
         <h3 class="mode-card-title">画幅圆角与下移</h3>
         <p class="mode-card-desc">
-          基准为 360×800：开启时画幅圆角 20px，并相对默认位置整体下移 12px。自适应模式下圆角与下移量按当前画幅相对 360 宽的缩放换算；固定大小模式下为绝对 20px / 12px。
+          圆角与下移可单独开关。圆角基准 20px（360×800）。下移距离用下方滑块设定，步长 4px，范围 8～64；自适应模式下实际下移按画幅相对 360 宽缩放，固定模式下为滑块绝对值。
         </p>
         <div class="mode-switch-row">
-          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换画幅圆角与下移" />
-          <span class="mode-switch-note">开：圆角 + 下移 / 关：保持现状</span>
+          <input id="frameRadiusSwitch" class="mode-switch" type="checkbox" aria-label="是否启用画幅圆角" />
+          <span class="mode-switch-note">是否有圆角</span>
         </div>
-        <span id="frameStyleSwitchLabel" class="mode-switch-label">当前状态：关闭 · 无圆角 · 无下移</span>
+        <span id="frameRadiusSwitchLabel" class="mode-switch-label">圆角：关</span>
+        <div class="mode-switch-row" style="margin-top: 8px">
+          <input id="frameOffsetSwitch" class="mode-switch" type="checkbox" aria-label="是否下移画幅" />
+          <span class="mode-switch-note">是否下移</span>
+        </div>
+        <span id="frameOffsetSwitchLabel" class="mode-switch-label">下移：关</span>
+        <div id="frameOffsetSliderBlock" class="frame-offset-slider-block">
+          <div class="frame-offset-slider-head">
+            <span>下移距离（基准 px，步长 4）</span>
+            <span id="frameOffsetSliderValue">12px</span>
+          </div>
+          <input
+            id="frameOffsetSlider"
+            type="range"
+            min="8"
+            max="64"
+            step="4"
+            value="12"
+            aria-label="画幅下移距离"
+          />
+        </div>
+        <span id="frameStyleSummaryLabel" class="mode-switch-label">圆角：关 · 下移：关 · 基准 12px</span>
       </section>
     </aside>
   </main>
@@ -989,8 +1035,13 @@
     const modeSwitchLabel = document.getElementById("modeSwitchLabel");
     const bottomGapSwitch = document.getElementById("bottomGapSwitch");
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
-    const frameStyleSwitch = document.getElementById("frameStyleSwitch");
-    const frameStyleSwitchLabel = document.getElementById("frameStyleSwitchLabel");
+    const frameRadiusSwitch = document.getElementById("frameRadiusSwitch");
+    const frameRadiusSwitchLabel = document.getElementById("frameRadiusSwitchLabel");
+    const frameOffsetSwitch = document.getElementById("frameOffsetSwitch");
+    const frameOffsetSwitchLabel = document.getElementById("frameOffsetSwitchLabel");
+    const frameOffsetSlider = document.getElementById("frameOffsetSlider");
+    const frameOffsetSliderValue = document.getElementById("frameOffsetSliderValue");
+    const frameStyleSummaryLabel = document.getElementById("frameStyleSummaryLabel");
     const bottomGapRuleText = document.getElementById("bottomGapRuleText");
     const bottomBar = document.getElementById("bottomBar");
     const gapLeftTag = document.getElementById("gapLeftTag");
@@ -1183,10 +1234,15 @@
       }
       let frameScale = rectW / 360;
 
-      const frameStyleOn = frameStyleSwitch.checked;
+      const frameRadiusOn = frameRadiusSwitch.checked;
+      const frameOffsetOn = frameOffsetSwitch.checked;
+      const offsetBasePx = Number(frameOffsetSlider.value);
+      frameOffsetSlider.disabled = !frameOffsetOn;
+      frameOffsetSliderValue.textContent = `${offsetBasePx}px`;
+
       let frameTopOffset = 0;
-      if (frameStyleOn) {
-        frameTopOffset = isAdaptiveMode ? Math.round(12 * frameScale) : 12;
+      if (frameOffsetOn) {
+        frameTopOffset = isAdaptiveMode ? Math.round(offsetBasePx * frameScale) : offsetBasePx;
         availableHeight = bottomBarTop - minGapToBottomBar - topBase - frameTopOffset;
         rectW = m.width;
         rectH = Math.round(rectW * 16 / 9);
@@ -1198,13 +1254,22 @@
       }
 
       const frameTop = topBase + frameTopOffset;
-      const frameRadiusPx = frameStyleOn
+      const frameRadiusPx = frameRadiusOn
         ? (isAdaptiveMode ? Math.round(20 * frameScale) : 20)
         : 0;
       cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
-      frameStyleSwitchLabel.textContent = frameStyleOn
-        ? `当前状态：开启 · 圆角 ${frameRadiusPx}px · 下移 ${frameTopOffset}px`
-        : "当前状态：关闭 · 无圆角 · 无下移";
+
+      frameRadiusSwitchLabel.textContent = frameRadiusOn
+        ? `圆角：开 · ${frameRadiusPx}px`
+        : "圆角：关";
+      frameOffsetSwitchLabel.textContent = frameOffsetOn
+        ? `下移：开 · 实际 ${frameTopOffset}px（基准 ${offsetBasePx}px）`
+        : "下移：关";
+      frameStyleSummaryLabel.textContent = [
+        `圆角：${frameRadiusOn ? "开" : "关"}`,
+        `下移：${frameOffsetOn ? "开" : "关"}`,
+        `基准 ${offsetBasePx}px`,
+      ].join(" · ");
 
       const rectX = Math.floor((m.width - rectW) / 2);
       cameraRect.style.left = `${rectX}px`;
@@ -1328,7 +1393,9 @@
     modelSlider.addEventListener("input", render);
     modeSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
-    frameStyleSwitch.addEventListener("input", render);
+    frameRadiusSwitch.addEventListener("input", render);
+    frameOffsetSwitch.addEventListener("input", render);
+    frameOffsetSlider.addEventListener("input", render);
 
     setupRangeTicks();
     syncModelSliderByRange();
