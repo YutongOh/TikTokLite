@@ -1168,9 +1168,6 @@
 
       <section class="card mode-card">
         <h3 class="mode-card-title">画幅展示规则</h3>
-        <p class="mode-card-desc">
-          控制画幅展示方式：9:16 完全展示、9:16 撑满宽度、9:16 撑满高度。
-        </p>
         <div id="frameFitOptions" class="frame-fit-options">
           <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="contain" /><span>9:16 完全展示</span></label>
           <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-width" checked /><span>9:16 撑满宽度（线上）</span></label>
@@ -1181,9 +1178,6 @@
 
       <section class="card mode-card frame-style-card">
         <h3 class="mode-card-title">V1 新增圆角&下移画幅</h3>
-        <p class="mode-card-desc">
-          控制画幅圆角与位置。开启后画幅增加 20px 圆角并整体下移 12px；关闭后画幅无圆角且不下移。
-        </p>
         <div class="mode-switch-row">
           <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与下移画幅" />
           <span class="mode-switch-note">开：圆角 20px + 下移 12px / 关：无圆角不下移</span>
@@ -1193,9 +1187,6 @@
 
       <section class="card mode-card switch-style-card">
         <h3 class="mode-card-title">V2 画幅通顶</h3>
-        <p class="mode-card-desc">
-          控制画幅是否通顶展示。开启后画幅顶端对齐屏幕顶端并覆盖系统顶部栏；关闭后保持当前不通顶布局。
-        </p>
         <div class="mode-switch-row">
           <input id="frameTopSwitch" class="mode-switch" type="checkbox" aria-label="切换画幅通顶" />
           <span class="mode-switch-note">开：通顶覆盖顶部 bar / 关：不通顶（现状）</span>
@@ -1205,9 +1196,6 @@
 
       <section class="card mode-card bottom-gap-card switch-style-card">
         <h3 class="mode-card-title">适配底部面板</h3>
-        <p class="mode-card-desc">
-          控制画幅与系统底部条之间的最小保留空间。基准值为 360×800 下 80px，开启后始终保留该间距。
-        </p>
         <div class="mode-switch-row">
           <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部80px约束" />
           <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
