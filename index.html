@@ -1197,12 +1197,12 @@
       </section>
 
       <section class="card mode-card frame-style-card">
-        <h3 class="mode-card-title">V1 新增圆角&下移画幅</h3>
+        <h3 class="mode-card-title">V1 新增圆角&居中画幅</h3>
         <div class="mode-switch-row">
-          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与下移画幅" />
-          <span class="mode-switch-note">开：圆角 20px + 下移 12px / 关：无圆角不下移</span>
+          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与居中画幅" />
+          <span class="mode-switch-note">开：圆角 20dp + 画幅居中 / 关：无圆角不居中</span>
         </div>
-        <span id="frameStyleSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 无圆角 · 不下移</span>
+        <span id="frameStyleSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 无圆角 · 不居中</span>
       </section>
 
       <section class="card mode-card switch-style-card">
@@ -1582,35 +1582,13 @@
       let frameScale = rectW / 360;
 
       const frameStyleOn = frameStyleSwitch.checked;
-
-      let frameTopOffset = 0;
-      if (frameStyleOn) {
-        frameTopOffset = 12;
-        availableHeight = bottomBarTop - minGapToBottomBar - topBase - frameTopOffset;
-        rectW = m.width;
-        rectH = Math.round(rectW * 16 / 9);
-        if (frameFitMode === "contain") {
-          if (rectH > availableHeight) {
-            rectH = availableHeight;
-            rectW = Math.floor(rectH * 9 / 16);
-          }
-        } else if (frameFitMode === "cover-width") {
-          const fullWidthFrameH = Math.round(m.width * 16 / 9);
-          rectW = m.width;
-          rectH = Math.min(fullWidthFrameH, availableHeight);
-        } else {
-          rectH = availableHeight;
-          rectW = Math.round(rectH * 9 / 16);
-        }
-        frameScale = rectW / 360;
-      }
-
+      const frameTopOffset = frameStyleOn ? Math.max(0, Math.round((availableHeight - rectH) / 2)) : 0;
       const frameTop = topBase + frameTopOffset;
       const frameRadiusPx = frameStyleOn ? 20 : 0;
       cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20dp · 下移 12dp"
-        : "当前状态：关闭 · 无圆角 · 不下移";
+        ? "当前状态：开启 · 圆角 20dp · 画幅居中"
+        : "当前状态：关闭 · 无圆角 · 不居中";
 
       const rectX = Math.floor((m.width - rectW) / 2);
       cameraRect.style.left = `${rectX}px`;
