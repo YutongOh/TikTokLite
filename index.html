@@ -436,6 +436,13 @@
       white-space: normal;
       overflow-wrap: anywhere;
     }
+    .frame-fit-options.is-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .frame-fit-options.is-disabled .frame-fit-option {
+      cursor: not-allowed;
+    }
     .mode-card.frame-style-card .mode-card-desc,
     .mode-card.switch-style-card .mode-card-desc {
       margin-bottom: 2px;
@@ -1204,6 +1211,10 @@
           <input id="frameTopSwitch" class="mode-switch" type="checkbox" aria-label="切换画幅通顶" />
           <span class="mode-switch-note">开：通顶覆盖顶部 bar / 关：不通顶（现状）</span>
         </div>
+        <div class="mode-switch-row">
+          <input id="frameTopExclusiveFitSwitch" class="mode-switch" type="checkbox" aria-label="切换V2通顶专属画幅展示规则" />
+          <span class="mode-switch-note">开：优先撑满高度，若宽度不足再撑满宽度 / 关：按上方规则手动选择</span>
+        </div>
         <span id="frameTopSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：不通顶</span>
       </section>
 
@@ -1334,8 +1345,10 @@
     const shootTabCenter = document.getElementById("shootTabCenter");
     const frameFitModeInputs = document.querySelectorAll('input[name="frameFitMode"]');
     const frameFitSwitchLabel = document.getElementById("frameFitSwitchLabel");
+    const frameFitOptions = document.getElementById("frameFitOptions");
     const frameTopSwitch = document.getElementById("frameTopSwitch");
     const frameTopSwitchLabel = document.getElementById("frameTopSwitchLabel");
+    const frameTopExclusiveFitSwitch = document.getElementById("frameTopExclusiveFitSwitch");
     const bottomGapSwitch = document.getElementById("bottomGapSwitch");
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
     const frameStyleSwitch = document.getElementById("frameStyleSwitch");
@@ -1502,15 +1515,15 @@
         ? ((rangeIndex - rangeMin) / (rangeMax - rangeMin)) * 100
         : 0;
       rangeSlider.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, rangePercent))}%`);
-      const frameFitMode = [...frameFitModeInputs].find((input) => input.checked)?.value || "cover-width";
+      const selectedFrameFitMode = [...frameFitModeInputs].find((input) => input.checked)?.value || "cover-width";
       const frameFitLabelMap = {
         "contain": "9:16 完全展示",
         "cover-width": "9:16 撑满宽度（线上）",
         "cover-height": "9:16 撑满高度",
       };
-      frameFitSwitchLabel.textContent = `当前状态：${frameFitLabelMap[frameFitMode] || "9:16 撑满宽度（线上）"}`;
       const frameTopOn = frameTopSwitch.checked;
-      frameTopSwitchLabel.textContent = frameTopOn ? "当前状态：通顶（覆盖顶部 bar）" : "当前状态：不通顶";
+      const frameTopExclusiveFitOn = frameTopExclusiveFitSwitch.checked;
+      const frameTopDedicatedFitOn = frameTopOn && frameTopExclusiveFitOn;
 
       const stageWidth = 360;
       const stageHeight = 800;
@@ -1536,6 +1549,20 @@
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
       let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
+      frameFitOptions.classList.toggle("is-disabled", frameTopDedicatedFitOn);
+      frameFitModeInputs.forEach((input) => {
+        input.disabled = frameTopDedicatedFitOn;
+      });
+      let frameFitMode = selectedFrameFitMode;
+      if (frameTopDedicatedFitOn) {
+        const fullHeightFrameW = Math.round(availableHeight * 9 / 16);
+        frameFitMode = fullHeightFrameW < m.width ? "cover-width" : "cover-height";
+      }
+      const frameFitStatusPrefix = frameTopDedicatedFitOn ? "当前状态：V2 专属 · " : "当前状态：";
+      frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${frameFitLabelMap[frameFitMode] || "9:16 撑满宽度（线上）"}`;
+      frameTopSwitchLabel.textContent = frameTopOn
+        ? (frameTopDedicatedFitOn ? "当前状态：通顶 · V2专属规则开启" : "当前状态：通顶（覆盖顶部 bar）")
+        : "当前状态：不通顶";
 
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
@@ -1700,6 +1727,7 @@
     modelSlider.addEventListener("input", render);
     frameFitModeInputs.forEach((input) => input.addEventListener("input", render));
     frameTopSwitch.addEventListener("input", render);
+    frameTopExclusiveFitSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
     frameStyleSwitch.addEventListener("input", render);
 
