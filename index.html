@@ -127,7 +127,7 @@
       justify-content: center;
       overflow: hidden;
     }
-    /* 返回：Figma node 21:2563 — Leading(44×44) + Item(Tinted 24×24) */
+    /* 返回：Figma node 22:2572 — Leading(44×44) + Item 24×24（位图资源） */
     .camera-back {
       position: absolute;
       left: 6px;
@@ -157,20 +157,14 @@
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
-      background: #636363;
     }
-    .camera-back-arrow {
+    .camera-back-item-img {
       position: absolute;
-      inset: 14.58% 8.33%;
-      display: block;
-      width: auto;
-      height: auto;
-      max-width: none;
-    }
-    .camera-back-arrow svg {
+      inset: 0;
       width: 100%;
       height: 100%;
       display: block;
+      object-fit: contain;
     }
     .sound-entrance {
       position: absolute;
@@ -1246,11 +1240,7 @@
             <div id="cameraBack" class="camera-back" aria-hidden="true">
               <div class="camera-back-variant" data-variant="Icon">
                 <div class="camera-back-icon-slot" data-style="Tinted">
-                  <div class="camera-back-arrow" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none">
-                      <path d="M12.5 2.5L6.5 8.5L12.5 14.5" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </div>
+                  <img class="camera-back-item-img" src="https://www.figma.com/api/mcp/asset/94bb1d41-2191-4184-8b2c-27b6b7ece1c8" alt="" />
                 </div>
               </div>
             </div>
