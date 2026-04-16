@@ -133,8 +133,7 @@
       max-width: 190px;
       width: 190px;
       height: 44px;
-      transform: translateX(-50%) scale(var(--sound-entrance-scale, 1));
-      transform-origin: top center;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1199,23 +1198,6 @@
                 <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/683dc837-e14e-4a09-8e08-be31b80d7a1b" alt="" /></span>
               </span>
             </div>
-            <div id="musicEntrance" class="sound-entrance" aria-hidden="true">
-              <div class="sound-name">
-                <div class="icontools-icon-frame">
-                  <div class="icon-fill-hack">
-                    <img src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
-                  </div>
-                </div>
-                <p class="text-wrapper">Fly me to the moon an</p>
-              </div>
-              <div class="split-line"></div>
-              <div class="close">
-                <div class="icon-fill-hack-wrapper">
-                  <img class="img" src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
-                </div>
-              </div>
-            </div>
-
             <div id="cameraRect" class="camera-rect">
               <video
                 id="cameraVideo"
@@ -1281,6 +1263,22 @@
             </div>
           </div>
             <div id="bottomBar" class="bottom-bar"></div>
+          </div>
+        </div>
+        <div id="musicEntrance" class="sound-entrance" aria-hidden="true">
+          <div class="sound-name">
+            <div class="icontools-icon-frame">
+              <div class="icon-fill-hack">
+                <img src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
+              </div>
+            </div>
+            <p class="text-wrapper">Fly me to the moon an</p>
+          </div>
+          <div class="split-line"></div>
+          <div class="close">
+            <div class="icon-fill-hack-wrapper">
+              <img class="img" src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
+            </div>
           </div>
         </div>
         <div id="gapLeftTag" class="gap-tag gap-left gap-outside" hidden>左间距 0dp</div>
@@ -1695,10 +1693,8 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      // Keep sound entrance visually fixed across model scaling.
-      musicEntrance.style.setProperty("--sound-entrance-scale", `${1 / scale}`);
-      // Follow status bar height: top = statusBarHeight + 12dp.
-      musicEntrance.style.top = `${(m.statusBarHeight + 12) / scale}px`;
+      // Sound entrance now lives outside scaled phone node.
+      musicEntrance.style.top = `${m.statusBarHeight + 12}px`;
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
