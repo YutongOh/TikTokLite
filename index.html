@@ -1395,7 +1395,7 @@
         <h3 class="mode-card-title">V1 新增圆角&居中画幅</h3>
         <div class="mode-switch-row">
           <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与居中画幅" />
-          <span class="mode-switch-note">开：圆角 20dp + 画幅居中 / 关：无圆角不居中</span>
+          <span class="mode-switch-note">开：仅屏幕内可见画幅圆角 20dp（超出部分先裁切再圆角）+ 画幅居中 / 关：无圆角不居中</span>
         </div>
         <div class="mode-switch-row">
           <input id="toolbarFollowFrameSwitch" class="mode-switch" type="checkbox" aria-label="切换工具栏是否跟随画幅顶部" />
@@ -1412,8 +1412,8 @@
           <span class="mode-switch-note">开：通顶覆盖顶部 bar / 关：不通顶（现状）</span>
         </div>
         <div class="mode-switch-row">
-          <input id="frameTopExclusiveFitSwitch" class="mode-switch" type="checkbox" aria-label="切换V2通顶专属画幅展示规则" />
-          <span class="mode-switch-note">开：优先撑满高度，若宽度不足再撑满宽度 / 关：按上方规则手动选择</span>
+          <input id="frameTopExclusiveFitSwitch" class="mode-switch" type="checkbox" aria-label="切换V2专属画幅展示规则（可单独开启）" />
+          <span class="mode-switch-note">可单独开启；开：专属画幅规则（置灰上方画幅展示规则）/ 关：按画幅展示规则手动选择</span>
         </div>
         <span id="frameTopSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：不通顶</span>
       </section>
@@ -1756,8 +1756,8 @@
         "cover-height": "9:16 撑满高度",
       };
       const frameTopOn = frameTopSwitch.checked;
-      const frameTopExclusiveFitOn = frameTopExclusiveFitSwitch.checked;
-      const frameTopDedicatedFitOn = frameTopOn && frameTopExclusiveFitOn;
+      /** V2 第二个开关：可单独开启；开启后禁用「画幅展示规则」并按专属逻辑自动选 cover-height / cover-width */
+      const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
 
       const stageWidth = 360;
       const stageHeight = 800;
@@ -1783,20 +1783,20 @@
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
       let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
-      frameFitOptions.classList.toggle("is-disabled", frameTopDedicatedFitOn);
+      frameFitOptions.classList.toggle("is-disabled", v2ExclusiveFrameFitOn);
       frameFitModeInputs.forEach((input) => {
-        input.disabled = frameTopDedicatedFitOn;
+        input.disabled = v2ExclusiveFrameFitOn;
       });
       let frameFitMode = selectedFrameFitMode;
-      if (frameTopDedicatedFitOn) {
+      if (v2ExclusiveFrameFitOn) {
         const fullHeightFrameW = Math.round(availableHeight * 9 / 16);
         frameFitMode = fullHeightFrameW < m.width ? "cover-width" : "cover-height";
       }
-      const frameFitStatusPrefix = frameTopDedicatedFitOn ? "当前状态：V2 专属 · " : "当前状态：";
+      const frameFitStatusPrefix = v2ExclusiveFrameFitOn ? "当前状态：V2 专属 · " : "当前状态：";
       frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${frameFitLabelMap[frameFitMode] || "9:16 撑满宽度（线上）"}`;
       frameTopSwitchLabel.textContent = frameTopOn
-        ? (frameTopDedicatedFitOn ? "当前状态：通顶 · V2专属规则开启" : "当前状态：通顶（覆盖顶部 bar）")
-        : "当前状态：不通顶";
+        ? (v2ExclusiveFrameFitOn ? "当前状态：通顶 · V2专属画幅规则开启" : "当前状态：通顶（覆盖顶部 bar）")
+        : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2专属画幅规则开启（自动选撑满高/宽）" : "当前状态：不通顶");
 
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
@@ -1818,10 +1818,8 @@
       const frameStyleOn = frameStyleSwitch.checked;
       const frameTopOffset = frameStyleOn ? Math.max(0, Math.round((availableHeight - rectH) / 2)) : 0;
       const frameTop = topBase + frameTopOffset;
-      const frameRadiusPx = frameStyleOn ? 20 : 0;
-      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20dp · 画幅居中"
+        ? "当前状态：开启 · 屏幕内圆角 20dp（先裁切后圆角）· 画幅居中"
         : "当前状态：关闭 · 无圆角 · 不居中";
       const toolbarFollowFrameOn = toolbarFollowFrameSwitch.checked;
       toolbarFollowFrameSwitchLabel.textContent = toolbarFollowFrameOn
@@ -1833,6 +1831,21 @@
       cameraRect.style.top = `${frameTop}px`;
       cameraRect.style.width = `${rectW}px`;
       cameraRect.style.height = `${rectH}px`;
+      {
+        const frameRadiusDp = 20;
+        const frameRadiusPx = frameStyleOn ? frameRadiusDp : 0;
+        if (frameStyleOn && frameRadiusPx > 0) {
+          const topInset = Math.max(0, -frameTop);
+          const rightInset = Math.max(0, rectX + rectW - m.width);
+          const bottomInset = Math.max(0, frameTop + rectH - m.height);
+          const leftInset = Math.max(0, -rectX);
+          cameraRect.style.borderRadius = "0";
+          cameraRect.style.clipPath = `inset(${topInset}px ${rightInset}px ${bottomInset}px ${leftInset}px round ${frameRadiusPx}px)`;
+        } else {
+          cameraRect.style.clipPath = "none";
+          cameraRect.style.borderRadius = "0";
+        }
+      }
       const fixedModeCompensationScale = 1 / scale;
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
