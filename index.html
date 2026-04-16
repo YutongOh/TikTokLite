@@ -1125,9 +1125,9 @@
             <div id="bottomBar" class="bottom-bar"></div>
           </div>
         </div>
-        <div id="gapLeftTag" class="gap-tag gap-left gap-outside" hidden>左间距 0px</div>
-        <div id="gapRightTag" class="gap-tag gap-right gap-outside" hidden>右间距 0px</div>
-        <div id="gapBottomTag" class="gap-tag gap-bottom gap-outside" hidden>距底部Bar 0px</div>
+        <div id="gapLeftTag" class="gap-tag gap-left gap-outside" hidden>左间距 0dp</div>
+        <div id="gapRightTag" class="gap-tag gap-right gap-outside" hidden>右间距 0dp</div>
+        <div id="gapBottomTag" class="gap-tag gap-bottom gap-outside" hidden>距底部Bar 0dp</div>
 
       </div>
     </section>
@@ -1165,7 +1165,7 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">80px</code>，
+          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">80dp</code>，
           <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
@@ -1213,7 +1213,7 @@
           <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部80px约束" />
           <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 保留 0px</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 保留 0dp</span>
       </section>
     </aside>
   </main>
@@ -1515,23 +1515,23 @@
       const stageWidth = 360;
       const stageHeight = 800;
       const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
-      phone.style.width = `${m.width}px`;
-      phone.style.height = `${m.height}px`;
+      phone.style.width = `${m.width}dp`;
+      phone.style.height = `${m.height}dp`;
       phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
 
-      statusBar.style.height = `${m.statusBarHeight}px`;
+      statusBar.style.height = `${m.statusBarHeight}dp`;
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
       const bottomBarHeight = 24;
-      bottomBar.style.height = `${bottomBarHeight}px`;
+      bottomBar.style.height = `${bottomBarHeight}dp`;
       const enforceBottomGap = bottomGapSwitch.checked;
       const baseBottomGap = 80;
       const minGapToBottomBar = enforceBottomGap ? baseBottomGap : 0;
       bottomGapSwitchLabel.textContent = enforceBottomGap
-        ? `当前状态：启用 · 保留 ${minGapToBottomBar}px`
-        : "当前状态：关闭 · 保留 0px";
-      bottomGapRuleText.textContent = `${minGapToBottomBar}px`;
+        ? `当前状态：启用 · 保留 ${minGapToBottomBar}dp`
+        : "当前状态：关闭 · 保留 0dp";
+      bottomGapRuleText.textContent = `${minGapToBottomBar}dp`;
 
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
@@ -1580,35 +1580,35 @@
 
       const frameTop = topBase + frameTopOffset;
       const frameRadiusPx = frameStyleOn ? 20 : 0;
-      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
+      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}dp` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20px · 下移 12px"
+        ? "当前状态：开启 · 圆角 20px · 下移 12dp"
         : "当前状态：关闭 · 无圆角 · 不下移";
 
       const rectX = Math.floor((m.width - rectW) / 2);
-      cameraRect.style.left = `${rectX}px`;
-      cameraRect.style.top = `${frameTop}px`;
-      cameraRect.style.width = `${rectW}px`;
-      cameraRect.style.height = `${rectH}px`;
+      cameraRect.style.left = `${rectX}dp`;
+      cameraRect.style.top = `${frameTop}dp`;
+      cameraRect.style.width = `${rectW}dp`;
+      cameraRect.style.height = `${rectH}dp`;
       const fixedModeCompensationScale = 1 / scale;
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
-      // 工具栏定位改为：基于系统状态栏顶端 + 28px
-      rightTools.style.top = `${Math.round(m.statusBarHeight + 28 * uiScale)}px`;
-      rightTools.style.width = "56px";
-      rightTools.style.height = "354px";
+      // 工具栏定位改为：基于系统状态栏顶端 + 28dp
+      rightTools.style.top = `${Math.round(m.statusBarHeight + 28 * uiScale)}dp`;
+      rightTools.style.width = "56dp";
+      rightTools.style.height = "354dp";
       rightTools.style.transform = `scale(${uiScale})`;
       let circleSize;
       let captureScale;
       captureScale = fixedModeCompensationScale;
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
-      // 拍摄按钮距离规则：仅在「9:16 撑满高度」模式下为 32px，其余维持 12px
+      // 拍摄按钮距离规则：仅在「9:16 撑满高度」模式下为 32px，其余维持 12dp
       const circleBottomInset = frameFitMode === "cover-height" ? 32 : 12;
-      captureCircle.style.width = `${circleSize}px`;
-      captureCircle.style.height = `${circleSize}px`;
-      captureCircle.style.bottom = `${circleBottomInset}px`;
+      captureCircle.style.width = `${circleSize}dp`;
+      captureCircle.style.height = `${circleSize}dp`;
+      captureCircle.style.bottom = `${circleBottomInset}dp`;
       const tabScale = fixedModeCompensationScale;
       const tabGap = Math.max(8, 16 * tabScale);
       const tabFontSize = Math.max(9, 14 * tabScale);
@@ -1621,17 +1621,17 @@
       const tab60sWidth = Math.max(16, 26 * tabScale);
       const tabPhotoWidth = Math.max(24, 40 * tabScale);
       const tabBottomToButton = Math.round(16 * layoutScale);
-      shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}px`);
-      shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}px`);
-      shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}px`);
-      shootTab.style.setProperty("--shoot-tab-letter-spacing", `${tabLetterSpacing}px`);
-      shootTab.style.setProperty("--shoot-tab-pill-width", `${tabPillWidth}px`);
-      shootTab.style.setProperty("--shoot-tab-pill-height", `${tabPillHeight}px`);
-      shootTab.style.setProperty("--shoot-tab-pill-radius", `${tabPillRadius}px`);
-      shootTab.style.setProperty("--shoot-tab-item-3m-width", `${tab3mWidth}px`);
-      shootTab.style.setProperty("--shoot-tab-item-60s-width", `${tab60sWidth}px`);
-      shootTab.style.setProperty("--shoot-tab-item-photo-width", `${tabPhotoWidth}px`);
-      shootTab.style.bottom = `${circleBottomInset + circleSize + tabBottomToButton}px`;
+      shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}dp`);
+      shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}dp`);
+      shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}dp`);
+      shootTab.style.setProperty("--shoot-tab-letter-spacing", `${tabLetterSpacing}dp`);
+      shootTab.style.setProperty("--shoot-tab-pill-width", `${tabPillWidth}dp`);
+      shootTab.style.setProperty("--shoot-tab-pill-height", `${tabPillHeight}dp`);
+      shootTab.style.setProperty("--shoot-tab-pill-radius", `${tabPillRadius}dp`);
+      shootTab.style.setProperty("--shoot-tab-item-3m-width", `${tab3mWidth}dp`);
+      shootTab.style.setProperty("--shoot-tab-item-60s-width", `${tab60sWidth}dp`);
+      shootTab.style.setProperty("--shoot-tab-item-photo-width", `${tabPhotoWidth}dp`);
+      shootTab.style.bottom = `${circleBottomInset + circleSize + tabBottomToButton}dp`;
       const pillCenterX = shootTabCenter.offsetLeft + shootTabCenter.offsetWidth / 2;
       shootTab.style.transform = `translateX(${-pillCenterX}px)`;
       const sideGap = Math.max(0, rectX);
@@ -1642,15 +1642,15 @@
       if (sideGap > 0) {
         gapLeftTag.hidden = false;
         gapRightTag.hidden = false;
-        gapLeftTag.textContent = `左间距 ${sideGap}px`;
-        gapRightTag.textContent = `右间距 ${sideGap}px`;
+        gapLeftTag.textContent = `左间距 ${sideGap}dp`;
+        gapRightTag.textContent = `右间距 ${sideGap}dp`;
       } else {
         gapLeftTag.hidden = true;
         gapRightTag.hidden = true;
       }
       if (bottomGap > 0) {
         gapBottomTag.hidden = false;
-        gapBottomTag.textContent = `距底部Bar ${bottomGap}px`;
+        gapBottomTag.textContent = `距底部Bar ${bottomGap}dp`;
       } else {
         gapBottomTag.hidden = true;
       }
@@ -1658,15 +1658,15 @@
       const ratio = `≈ ${approximateRatio(m.width, m.height)}`;
       totalModelsText.textContent = `${MODELS.length}`;
       rangeText.textContent = `${bucket.label} (${bucket.helper}) · ${bucket.minW}×${bucket.minH} ~ ${bucket.maxW}×${bucket.maxH}（${bucket.models.length}台）`;
-      sizeText.textContent = `${m.width}×${m.height} px`;
+      sizeText.textContent = `${m.width}×${m.height} dp`;
       ratioText.textContent = ratio;
-      rectSizeText.textContent = `${rectW}×${rectH} px`;
-      sideGapText.textContent = sideGap > 0 ? `${sideGap}px / ${sideGap}px` : "无";
-      bottomGapText.textContent = `${bottomGap}px`;
+      rectSizeText.textContent = `${rectW}×${rectH} dp`;
+      sideGapText.textContent = sideGap > 0 ? `${sideGap}px / ${sideGap}dp` : "无";
+      bottomGapText.textContent = `${bottomGap}dp`;
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}px · 画幅顶部：${frameTop}px${frameTopOffset ? `（含下移 ${frameTopOffset}px）` : ""} · 系统底部指示条：${bottomBarHeight}px · 距底部系统条：${bottomGap}px（最低 ${minGapToBottomBar}px）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}px · 画幅顶部：${frameTop}px${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}px · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
