@@ -127,6 +127,42 @@
       justify-content: center;
       overflow: hidden;
     }
+    /* 返回：外区含 padding 10，内层 24×24，icon 20×17；整体左缘距屏 6dp（JS 同步垂直与 music） */
+    .camera-back {
+      position: absolute;
+      left: 6px;
+      z-index: 6;
+      display: inline-flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+      pointer-events: none;
+      transform-origin: left center;
+    }
+    .camera-back-inner {
+      padding: 10px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 20px;
+      box-sizing: border-box;
+    }
+    .camera-back-icon-slot {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .camera-back-svg {
+      width: 20px;
+      height: 17px;
+      display: block;
+      flex-shrink: 0;
+    }
     .sound-entrance {
       position: absolute;
       left: 50%;
@@ -1198,6 +1234,15 @@
                 <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/683dc837-e14e-4a09-8e08-be31b80d7a1b" alt="" /></span>
               </span>
             </div>
+            <div id="cameraBack" class="camera-back" aria-hidden="true">
+              <div class="camera-back-inner">
+                <div class="camera-back-icon-slot">
+                  <svg class="camera-back-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none" aria-hidden="true">
+                    <path d="M12.5 2.5L6.5 8.5L12.5 14.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
             <div id="musicEntrance" class="sound-entrance" aria-hidden="true">
               <div class="sound-name">
                 <div class="icontools-icon-frame">
@@ -1492,6 +1537,7 @@
     const phone = document.getElementById("phone");
     const statusBar = document.getElementById("statusBar");
     const musicEntrance = document.getElementById("musicEntrance");
+    const cameraBack = document.getElementById("cameraBack");
     const cameraRect = document.getElementById("cameraRect");
     const rightTools = document.getElementById("rightTools");
     const cameraVideo = document.getElementById("cameraVideo");
@@ -1596,6 +1642,11 @@
           musicEntrance.style.left = `${pageCx}px`;
           musicEntrance.style.top = `${iconCy}px`;
           musicEntrance.style.transform = `translate(-50%, -50%) scale(${layoutUiScale})`;
+          if (cameraBack) {
+            cameraBack.style.left = "6px";
+            cameraBack.style.top = `${iconCy}px`;
+            cameraBack.style.transform = `translateY(-50%) scale(${layoutUiScale})`;
+          }
         });
       });
     }
@@ -1797,6 +1848,11 @@
       musicEntrance.style.left = `${m.width * 0.5}px`;
       musicEntrance.style.top = `${iconCyAnalytic}px`;
       musicEntrance.style.transform = `translate(-50%, -50%) scale(${uiScale})`;
+      if (cameraBack) {
+        cameraBack.style.left = "6px";
+        cameraBack.style.top = `${iconCyAnalytic}px`;
+        cameraBack.style.transform = `translateY(-50%) scale(${uiScale})`;
+      }
       scheduleMusicEntranceAlign(m, uiScale);
       let circleSize;
       let captureScale;
