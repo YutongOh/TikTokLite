@@ -121,7 +121,7 @@
     .camera-rect {
       position: absolute;
       left: 0;
-      border-radius: 20px;
+      border-radius: 0;
       background:
         radial-gradient(circle at 30% 12%, rgba(255, 124, 159, 0.38), transparent 40%),
         linear-gradient(180deg, #8a4e8d 0%, #d16074 40%, #6d3724 84%, #3c180f 100%);
@@ -857,6 +857,17 @@
         </div>
         <span id="bottomGapSwitchLabel" class="mode-switch-label">当前状态：启用 · 保留 88px</span>
       </section>
+      <section class="card mode-card frame-style-card">
+        <h3 class="mode-card-title">画幅圆角与下移</h3>
+        <p class="mode-card-desc">
+          基准为 360×800：开启时画幅圆角 20px，并相对默认位置整体下移 12px。自适应模式下圆角与下移量按当前画幅相对 360 宽的缩放换算；固定大小模式下为绝对 20px / 12px。
+        </p>
+        <div class="mode-switch-row">
+          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换画幅圆角与下移" />
+          <span class="mode-switch-note">开：圆角 + 下移 / 关：保持现状</span>
+        </div>
+        <span id="frameStyleSwitchLabel" class="mode-switch-label">当前状态：关闭 · 无圆角 · 无下移</span>
+      </section>
     </aside>
   </main>
 
@@ -978,6 +989,8 @@
     const modeSwitchLabel = document.getElementById("modeSwitchLabel");
     const bottomGapSwitch = document.getElementById("bottomGapSwitch");
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
+    const frameStyleSwitch = document.getElementById("frameStyleSwitch");
+    const frameStyleSwitchLabel = document.getElementById("frameStyleSwitchLabel");
     const bottomGapRuleText = document.getElementById("bottomGapRuleText");
     const bottomBar = document.getElementById("bottomBar");
     const gapLeftTag = document.getElementById("gapLeftTag");
@@ -1158,9 +1171,9 @@
         : "当前状态：关闭 · 保留 0px";
       bottomGapRuleText.textContent = `${minGapToBottomBar}px`;
 
-      const top = m.statusBarHeight;
+      const topBase = m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
-      const availableHeight = bottomBarTop - minGapToBottomBar - top;
+      let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
 
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
@@ -1168,13 +1181,36 @@
         rectH = availableHeight;
         rectW = Math.floor(rectH * 9 / 16);
       }
+      let frameScale = rectW / 360;
+
+      const frameStyleOn = frameStyleSwitch.checked;
+      let frameTopOffset = 0;
+      if (frameStyleOn) {
+        frameTopOffset = isAdaptiveMode ? Math.round(12 * frameScale) : 12;
+        availableHeight = bottomBarTop - minGapToBottomBar - topBase - frameTopOffset;
+        rectW = m.width;
+        rectH = Math.round(rectW * 16 / 9);
+        if (rectH > availableHeight) {
+          rectH = availableHeight;
+          rectW = Math.floor(rectH * 9 / 16);
+        }
+        frameScale = rectW / 360;
+      }
+
+      const frameTop = topBase + frameTopOffset;
+      const frameRadiusPx = frameStyleOn
+        ? (isAdaptiveMode ? Math.round(20 * frameScale) : 20)
+        : 0;
+      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
+      frameStyleSwitchLabel.textContent = frameStyleOn
+        ? `当前状态：开启 · 圆角 ${frameRadiusPx}px · 下移 ${frameTopOffset}px`
+        : "当前状态：关闭 · 无圆角 · 无下移";
 
       const rectX = Math.floor((m.width - rectW) / 2);
       cameraRect.style.left = `${rectX}px`;
-      cameraRect.style.top = `${top}px`;
+      cameraRect.style.top = `${frameTop}px`;
       cameraRect.style.width = `${rectW}px`;
       cameraRect.style.height = `${rectH}px`;
-      const frameScale = rectW / 360;
       const minAdaptiveControlScale = 0.82;
       const fixedModeCompensationScale = 1 / scale;
       const layoutScale = isAdaptiveMode ? frameScale : fixedModeCompensationScale;
@@ -1182,7 +1218,7 @@
       const uiScale = isAdaptiveMode
         ? Math.max(minAdaptiveControlScale, Math.min(m.width / 360, m.height / 800))
         : fixedModeCompensationScale;
-      rightTools.style.top = `${top + Math.round(16 * uiScale)}px`;
+      rightTools.style.top = `${frameTop + Math.round(16 * uiScale)}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
@@ -1231,7 +1267,7 @@
       const pillCenterX = shootTabCenter.offsetLeft + shootTabCenter.offsetWidth / 2;
       shootTab.style.transform = `translateX(${-pillCenterX}px)`;
       const sideGap = Math.max(0, rectX);
-      const bottomGap = Math.max(0, bottomBarTop - (top + rectH));
+      const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
       const isCommonModel = TOP20_COMMON_SIZES.has(`${m.width}x${m.height}`);
       modelTicks.classList.toggle("common-selected", isCommonModel);
 
@@ -1262,7 +1298,7 @@
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}px · 画幅顶部：${top}px · 系统底部指示条：${bottomBarHeight}px · 距底部系统条：${bottomGap}px（最低 ${minGapToBottomBar}px）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}px · 画幅顶部：${frameTop}px${frameTopOffset ? `（含下移 ${frameTopOffset}px）` : ""} · 系统底部指示条：${bottomBarHeight}px · 距底部系统条：${bottomGap}px（最低 ${minGapToBottomBar}px）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
@@ -1292,6 +1328,7 @@
     modelSlider.addEventListener("input", render);
     modeSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
+    frameStyleSwitch.addEventListener("input", render);
 
     setupRangeTicks();
     syncModelSliderByRange();
