@@ -1495,9 +1495,15 @@
 
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
-      if (frameFitOn && rectH > availableHeight) {
+      if (frameFitOn) {
+        if (rectH > availableHeight) {
+          rectH = availableHeight;
+          rectW = Math.floor(rectH * 9 / 16);
+        }
+      } else {
+        // 宽度撑满；通过容器高度限制 + video cover 做上下裁剪
+        rectW = m.width;
         rectH = availableHeight;
-        rectW = Math.floor(rectH * 9 / 16);
       }
       let frameScale = rectW / 360;
 
@@ -1514,9 +1520,14 @@
         availableHeight = bottomBarTop - minGapToBottomBar - topBase - frameTopOffset;
         rectW = m.width;
         rectH = Math.round(rectW * 16 / 9);
-        if (frameFitOn && rectH > availableHeight) {
+        if (frameFitOn) {
+          if (rectH > availableHeight) {
+            rectH = availableHeight;
+            rectW = Math.floor(rectH * 9 / 16);
+          }
+        } else {
+          rectW = m.width;
           rectH = availableHeight;
-          rectW = Math.floor(rectH * 9 / 16);
         }
         frameScale = rectW / 360;
       }
@@ -1555,10 +1566,8 @@
       captureScale = fixedModeCompensationScale;
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
-      const circleBottomInset = Math.max(
-        0,
-        Math.round(12 * layoutScale - captureSvgBottomPad)
-      );
+      // 拍摄按钮始终距离「屏幕展示画幅」底边 12px
+      const circleBottomInset = 12;
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
