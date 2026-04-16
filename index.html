@@ -162,12 +162,11 @@
       inset: 4.17% 18.75% 4.17% 20.83%;
     }
     .icon-fill-hack img,
-    .icon-fill-hack-wrapper img,
-    .icontools-icon-frame > img,
-    .icon-fill-hack-wrapper > img {
+    .icon-fill-hack-wrapper img {
       width: 100%;
       height: 100%;
       display: block;
+      object-fit: contain;
     }
     .text-wrapper {
       flex: 1 1 0;
@@ -1166,7 +1165,9 @@
             <div id="musicEntrance" class="sound-entrance" aria-hidden="true">
               <div class="sound-name">
                 <div class="icontools-icon-frame">
-                  <img class="icon-fill-hack" src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
+                  <div class="icon-fill-hack">
+                    <img src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
+                  </div>
                 </div>
                 <p class="text-wrapper">Fly me to the moon an</p>
               </div>
