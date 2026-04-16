@@ -1202,7 +1202,12 @@
           <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与居中画幅" />
           <span class="mode-switch-note">开：圆角 20dp + 画幅居中 / 关：无圆角不居中</span>
         </div>
+        <div class="mode-switch-row">
+          <input id="toolbarFollowFrameSwitch" class="mode-switch" type="checkbox" aria-label="切换工具栏是否跟随画幅顶部" />
+          <span class="mode-switch-note">开：工具栏距画幅顶端 16dp / 关：工具栏距顶部 bar 28dp</span>
+        </div>
         <span id="frameStyleSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 无圆角 · 不居中</span>
+        <span id="toolbarFollowFrameSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 距顶部 bar 28dp</span>
       </section>
 
       <section class="card mode-card switch-style-card">
@@ -1353,6 +1358,8 @@
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
     const frameStyleSwitch = document.getElementById("frameStyleSwitch");
     const frameStyleSwitchLabel = document.getElementById("frameStyleSwitchLabel");
+    const toolbarFollowFrameSwitch = document.getElementById("toolbarFollowFrameSwitch");
+    const toolbarFollowFrameSwitchLabel = document.getElementById("toolbarFollowFrameSwitchLabel");
     const bottomGapRuleText = document.getElementById("bottomGapRuleText");
     const bottomBar = document.getElementById("bottomBar");
     const gapLeftTag = document.getElementById("gapLeftTag");
@@ -1589,6 +1596,10 @@
       frameStyleSwitchLabel.textContent = frameStyleOn
         ? "当前状态：开启 · 圆角 20dp · 画幅居中"
         : "当前状态：关闭 · 无圆角 · 不居中";
+      const toolbarFollowFrameOn = toolbarFollowFrameSwitch.checked;
+      toolbarFollowFrameSwitchLabel.textContent = toolbarFollowFrameOn
+        ? "当前状态：开启 · 距画幅顶端 16dp"
+        : "当前状态：关闭 · 距顶部 bar 28dp";
 
       const rectX = Math.floor((m.width - rectW) / 2);
       cameraRect.style.left = `${rectX}px`;
@@ -1599,8 +1610,9 @@
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
-      // 工具栏定位改为：基于系统状态栏顶端 + 28dp
-      rightTools.style.top = `${Math.round(m.statusBarHeight + 28 * uiScale)}px`;
+      rightTools.style.top = toolbarFollowFrameOn
+        ? `${Math.round(frameTop + 16 * uiScale)}px`
+        : `${Math.round(m.statusBarHeight + 28 * uiScale)}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
@@ -1708,6 +1720,7 @@
     frameTopExclusiveFitSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
     frameStyleSwitch.addEventListener("input", render);
+    toolbarFollowFrameSwitch.addEventListener("input", render);
 
     setupRangeTicks();
     syncModelSliderByRange();
