@@ -1574,6 +1574,31 @@
 
     let currentModelsInRange = [];
     let lastSelectionKey = "";
+    let musicEntranceAlignGen = 0;
+
+    /**
+     * Music bar: X = phone logical center; Y = visual center of Flip icon-wrap (accounts for toolbar scale).
+     * Double rAF reads layout after transforms composite; generation token drops stale callbacks.
+     */
+    function scheduleMusicEntranceAlign(layoutModel, layoutUiScale) {
+      const gen = (musicEntranceAlignGen += 1);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (gen !== musicEntranceAlignGen) return;
+          const flipWrap = rightTools.querySelector(".right-tool-item.is-flip .right-tool-icon-wrap");
+          if (!flipWrap || !musicEntrance) return;
+          const pr = phone.getBoundingClientRect();
+          const ir = flipWrap.getBoundingClientRect();
+          if (pr.width < 1 || pr.height < 1) return;
+          const sy = layoutModel.height / pr.height;
+          const iconCy = (ir.top + ir.height * 0.5 - pr.top) * sy;
+          const pageCx = layoutModel.width * 0.5;
+          musicEntrance.style.left = `${pageCx}px`;
+          musicEntrance.style.top = `${iconCy}px`;
+          musicEntrance.style.transform = `translate(-50%, -50%) scale(${layoutUiScale})`;
+        });
+      });
+    }
 
     rangeSlider.min = "0";
     rangeSlider.max = String(RANGE_BUCKETS.length - 1);
@@ -1763,16 +1788,16 @@
       const toolbarTop = toolbarFollowFrameOn
         ? Math.round(frameTop + 16 * uiScale)
         : Math.round(m.statusBarHeight + 16 * uiScale);
-      // Music entrance: (1) horizontal — page center (vertical midline of screen);
-      // (2) vertical — horizontal midline aligned with first toolbar icon-wrap (padding-top 4 + icon 28/2).
-      const firstIconCenterY = toolbarTop + 4 + 14;
-      musicEntrance.style.left = "50%";
-      musicEntrance.style.top = `${firstIconCenterY}px`;
-      musicEntrance.style.transform = `translate(-50%, -50%) scale(${uiScale})`;
       rightTools.style.top = `${toolbarTop}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
+      // Music: X = logical screen center; Y = Flip icon-wrap center (toolbar scale + origin: post-layout measure).
+      const iconCyAnalytic = toolbarTop + 18 * uiScale;
+      musicEntrance.style.left = `${m.width * 0.5}px`;
+      musicEntrance.style.top = `${iconCyAnalytic}px`;
+      musicEntrance.style.transform = `translate(-50%, -50%) scale(${uiScale})`;
+      scheduleMusicEntranceAlign(m, uiScale);
       let circleSize;
       let captureScale;
       captureScale = fixedModeCompensationScale;
