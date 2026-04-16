@@ -1141,6 +1141,17 @@
         </div>
         <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：完整展示 9:16</span>
       </section>
+      <section class="card mode-card">
+        <h3 class="mode-card-title">画幅通顶</h3>
+        <p class="mode-card-desc">
+          控制画幅是否通顶展示。开启后画幅顶端对齐屏幕顶端并覆盖系统顶部栏；关闭后保持当前不通顶布局。
+        </p>
+        <div class="mode-switch-row">
+          <input id="frameTopSwitch" class="mode-switch" type="checkbox" aria-label="切换画幅通顶" />
+          <span class="mode-switch-note">开：通顶覆盖顶部 bar / 关：不通顶（现状）</span>
+        </div>
+        <span id="frameTopSwitchLabel" class="mode-switch-label">当前状态：不通顶</span>
+      </section>
       <section class="card mode-card bottom-gap-card">
         <h3 class="mode-card-title">适配底部面板</h3>
         <p class="mode-card-desc">
@@ -1282,6 +1293,8 @@
     const shootTabCenter = document.getElementById("shootTabCenter");
     const frameFitSwitch = document.getElementById("frameFitSwitch");
     const frameFitSwitchLabel = document.getElementById("frameFitSwitchLabel");
+    const frameTopSwitch = document.getElementById("frameTopSwitch");
+    const frameTopSwitchLabel = document.getElementById("frameTopSwitchLabel");
     const bottomGapSwitch = document.getElementById("bottomGapSwitch");
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
     const frameStyleSwitch = document.getElementById("frameStyleSwitch");
@@ -1452,7 +1465,8 @@
       frameFitSwitchLabel.textContent = frameFitOn
         ? "当前状态：完整展示 9:16"
         : "当前状态：撑满宽度裁剪";
-
+      const frameTopOn = frameTopSwitch.checked;
+      frameTopSwitchLabel.textContent = frameTopOn ? "当前状态：通顶（覆盖顶部 bar）" : "当前状态：不通顶";
 
       const stageWidth = 360;
       const stageHeight = 800;
@@ -1472,7 +1486,7 @@
         : "当前状态：关闭 · 保留 0px";
       bottomGapRuleText.textContent = `${minGapToBottomBar}px`;
 
-      const topBase = m.statusBarHeight;
+      const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
       let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
 
@@ -1628,6 +1642,7 @@
     });
     modelSlider.addEventListener("input", render);
     frameFitSwitch.addEventListener("input", render);
+    frameTopSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
     frameStyleSwitch.addEventListener("input", render);
 
