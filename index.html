@@ -380,39 +380,51 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 0;
       transform-origin: top right;
       pointer-events: none;
+      overflow: hidden;
     }
     .right-tool-item {
-      width: 56px;
-      padding-top: 0;
-      padding-bottom: 0;
+      align-self: stretch;
+      width: 100%;
+      padding-top: 4px;
+      padding-bottom: 12px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
     }
-    .right-tool-icon {
+    .right-tool-icon-wrap {
+      width: 28px;
       height: 28px;
-      width: auto;
-      display: block;
+      position: relative;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .right-tool-icon.icon-flip { width: 33.21px; }
-    .right-tool-icon.icon-off { width: 24.07px; }
-    .right-tool-icon.icon-timer { width: 28px; }
-    .right-tool-icon.icon-speed { width: 26.83px; }
-    .right-tool-icon.icon-filters { width: 29.91px; }
-    .right-tool-icon.icon-beautify { width: 26.8px; }
+    .right-tool-item.is-flip .right-tool-icon-wrap {
+      width: 30px;
+      height: 28px;
+    }
+    .right-tool-icon {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
     .right-tool-label {
+      width: 56px;
       font-size: 10px;
       line-height: 1.3;
       color: #fff;
       letter-spacing: 0.23px;
       text-align: center;
       text-shadow: 0 1px 1px rgba(22, 24, 35, 0.2);
-      min-width: 56px;
+      word-wrap: break-word;
     }
 
     .rule {
@@ -1224,28 +1236,40 @@
               </svg>
             </div>
           <div id="rightTools" class="right-tools" aria-hidden="true">
-            <div class="right-tool-item">
-              <img class="right-tool-icon icon-flip" src="https://www.figma.com/api/mcp/asset/ba5f9515-c507-4439-8aa8-00592cc89711" alt="" />
+            <div class="right-tool-item is-flip">
+              <div class="right-tool-icon-wrap">
+                <img class="right-tool-icon icon-flip" src="https://www.figma.com/api/mcp/asset/ba5f9515-c507-4439-8aa8-00592cc89711" alt="" />
+              </div>
               <div class="right-tool-label">Flip</div>
             </div>
             <div class="right-tool-item">
-              <img class="right-tool-icon icon-off" src="https://www.figma.com/api/mcp/asset/c2b5f5fe-275c-43d6-b2f3-ef84a097bf32" alt="" />
+              <div class="right-tool-icon-wrap">
+                <img class="right-tool-icon icon-off" src="https://www.figma.com/api/mcp/asset/c2b5f5fe-275c-43d6-b2f3-ef84a097bf32" alt="" />
+              </div>
               <div class="right-tool-label">Off</div>
             </div>
             <div class="right-tool-item">
-              <img class="right-tool-icon icon-timer" src="https://www.figma.com/api/mcp/asset/6fd37300-cfe0-47fa-af10-75f269131494" alt="" />
+              <div class="right-tool-icon-wrap">
+                <img class="right-tool-icon icon-timer" src="https://www.figma.com/api/mcp/asset/6fd37300-cfe0-47fa-af10-75f269131494" alt="" />
+              </div>
               <div class="right-tool-label">Timer</div>
             </div>
             <div class="right-tool-item">
-              <img class="right-tool-icon icon-speed" src="https://www.figma.com/api/mcp/asset/47321161-0369-4e09-ae33-5219cd4df744" alt="" />
+              <div class="right-tool-icon-wrap">
+                <img class="right-tool-icon icon-speed" src="https://www.figma.com/api/mcp/asset/47321161-0369-4e09-ae33-5219cd4df744" alt="" />
+              </div>
               <div class="right-tool-label">Speed</div>
             </div>
             <div class="right-tool-item">
-              <img class="right-tool-icon icon-filters" src="https://www.figma.com/api/mcp/asset/319baa3f-8eba-49e5-84e3-3426e9a5ba16" alt="" />
+              <div class="right-tool-icon-wrap">
+                <img class="right-tool-icon icon-filters" src="https://www.figma.com/api/mcp/asset/319baa3f-8eba-49e5-84e3-3426e9a5ba16" alt="" />
+              </div>
               <div class="right-tool-label">Filters</div>
             </div>
             <div class="right-tool-item">
-              <img class="right-tool-icon icon-beautify" src="https://www.figma.com/api/mcp/asset/41a77c2a-c6fe-4a68-9b61-14c2cab318bd" alt="" />
+              <div class="right-tool-icon-wrap">
+                <img class="right-tool-icon icon-beautify" src="https://www.figma.com/api/mcp/asset/41a77c2a-c6fe-4a68-9b61-14c2cab318bd" alt="" />
+              </div>
               <div class="right-tool-label">Beautify</div>
             </div>
           </div>
