@@ -1604,9 +1604,8 @@
       captureScale = fixedModeCompensationScale;
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
-      // 拍摄按钮距离规则改为相对「屏幕底部」：无底部黑边 40dp；有底部黑边 89dp
-      const targetButtonBottomToScreen = enforceBottomGap ? 89 : 40;
-      const circleBottomInset = Math.max(0, m.height - (frameTop + rectH) - targetButtonBottomToScreen);
+      // 拍摄按钮距离规则：仅在「9:16 撑满高度」模式下为 32px，其余维持 12px
+      const circleBottomInset = frameFitMode === "cover-height" ? 32 : 12;
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
