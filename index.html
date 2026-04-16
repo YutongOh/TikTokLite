@@ -129,7 +129,7 @@
     }
     .sound-entrance {
       position: absolute;
-      left: 50%;
+      right: auto;
       max-width: 190px;
       width: 190px;
       height: 44px;
@@ -1760,7 +1760,9 @@
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
-      // Keep music entrance on same adaptation strategy as toolbar.
+      // Align horizontal center with first toolbar icon column (56dp bar, right:0, origin top-right scale).
+      const toolbarColumnCenterX = m.width - 28 * uiScale;
+      musicEntrance.style.left = `${Math.round(toolbarColumnCenterX)}px`;
       musicEntrance.style.top = `${Math.round(m.statusBarHeight + 12 * uiScale)}px`;
       musicEntrance.style.transform = `translateX(-50%) scale(${uiScale})`;
       rightTools.style.top = toolbarFollowFrameOn
