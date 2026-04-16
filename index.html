@@ -731,6 +731,40 @@
       width: calc(100% - 32px);
       margin-left: 16px;
       margin-right: 16px;
+      margin-top: 8px;
+      margin-bottom: 18px;
+    }
+    /* 尺寸区间 slider：参考图的半透明玻璃条形造型 */
+    input[type="range"].range-main::-webkit-slider-runnable-track {
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.08));
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+    }
+    input[type="range"].range-main::-webkit-slider-thumb {
+      width: 26px;
+      height: 26px;
+      margin-top: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.62);
+      background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.95), rgba(210, 216, 230, 0.86));
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+    input[type="range"].range-main::-moz-range-track {
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.08));
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+    }
+    input[type="range"].range-main::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.62);
+      background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.95), rgba(210, 216, 230, 0.86));
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(255, 255, 255, 0.08);
     }
 
     .slider-box input[type="range"]::-webkit-slider-runnable-track {
@@ -758,6 +792,39 @@
         0 0 16px rgba(139, 92, 246, 0.55),
         0 0 8px rgba(236, 72, 153, 0.25),
         0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 放在通用 slider-box 规则后，确保只覆盖尺寸区间这一条 */
+    .slider-box input[type="range"].range-main::-webkit-slider-runnable-track {
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.08));
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+    }
+    .slider-box input[type="range"].range-main::-webkit-slider-thumb {
+      width: 26px;
+      height: 26px;
+      margin-top: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.62);
+      background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.95), rgba(210, 216, 230, 0.86));
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+    .slider-box input[type="range"].range-main::-moz-range-track {
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.08));
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+    }
+    .slider-box input[type="range"].range-main::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.62);
+      background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.95), rgba(210, 216, 230, 0.86));
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(255, 255, 255, 0.08);
     }
 
     .slider-box .tick.active {
