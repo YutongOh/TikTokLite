@@ -37,6 +37,7 @@
       display: grid;
       grid-template-columns: minmax(520px, 1.08fr) minmax(500px, 1.04fr) minmax(240px, 0.48fr);
       gap: clamp(12px, 1.2vw, 20px);
+      align-items: stretch;
     }
 
     .card {
@@ -370,7 +371,11 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      gap: 12px;
+      gap: 10px;
+      min-height: 100%;
+    }
+    .side-panel > .mode-card:not(.frame-style-card) {
+      flex: 0 0 auto;
     }
     .mode-card {
       padding: 16px;
@@ -380,16 +385,30 @@
       min-height: 180px;
     }
     .bottom-gap-card {
-      min-height: 190px;
+      min-height: 176px;
     }
-    .frame-style-card {
-      min-height: 320px;
+    .mode-card.frame-style-card {
+      flex: 1 1 auto;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      padding: 14px 16px 16px;
+    }
+    .mode-card.frame-style-card .mode-card-desc {
+      margin-bottom: 2px;
+    }
+    .frame-style-summary {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px dashed var(--outline-soft);
     }
     .frame-offset-slider-block {
       display: grid;
-      gap: 4px;
-      margin-top: 6px;
-      padding-top: 10px;
+      gap: 6px;
+      margin-top: 2px;
+      padding-top: 8px;
       border-top: 1px dashed var(--outline-soft);
     }
     .frame-offset-slider-head {
@@ -920,7 +939,7 @@
           <span class="mode-switch-note">是否有圆角</span>
         </div>
         <span id="frameRadiusSwitchLabel" class="mode-switch-label">圆角：关</span>
-        <div class="mode-switch-row" style="margin-top: 8px">
+        <div class="mode-switch-row">
           <input id="frameOffsetSwitch" class="mode-switch" type="checkbox" aria-label="是否下移画幅" />
           <span class="mode-switch-note">是否下移</span>
         </div>
@@ -940,7 +959,7 @@
             aria-label="画幅下移距离"
           />
         </div>
-        <span id="frameStyleSummaryLabel" class="mode-switch-label">圆角：关 · 下移：关 · 基准 12px</span>
+        <span id="frameStyleSummaryLabel" class="mode-switch-label frame-style-summary">圆角：关 · 下移：关 · 基准 12px</span>
       </section>
     </aside>
   </main>
