@@ -1607,13 +1607,15 @@
       const fullWidthFrameH = Math.round(m.width * 16 / 9);
       const hasVerticalCropInCoverWidth = frameFitMode === "cover-width" && fullWidthFrameH > availableHeight;
       // 拍摄按钮距离规则：
-      // 1. 撑满宽度且上下发生裁剪时，距底部系统 bar 89dp
-      // 2. 撑满宽度且上下不裁剪时，距底部系统 bar 40dp
+      // 1. 撑满宽度且上下发生裁剪时，按钮中心距底部系统 bar 89dp
+      // 2. 撑满宽度且上下不裁剪时，按钮中心距底部系统 bar 40dp
       // 3. 撑满高度时，维持距画幅 32dp 的既有规则
       // 4. 其他情况维持 12dp
+      const targetButtonCenterToBottomBar =
+        frameFitMode === "cover-width" ? (hasVerticalCropInCoverWidth ? 89 : 40) : null;
       const circleBottomInset =
-        frameFitMode === "cover-width"
-          ? bottomBarHeight + (hasVerticalCropInCoverWidth ? 89 : 40)
+        targetButtonCenterToBottomBar !== null
+          ? Math.max(0, bottomBarHeight + targetButtonCenterToBottomBar - circleSize / 2)
           : frameFitMode === "cover-height"
             ? 32
             : 12;
