@@ -1474,9 +1474,10 @@
           rectW = Math.floor(rectH * 9 / 16);
         }
       } else {
-        // 宽度撑满；通过容器高度限制 + video cover 做上下裁剪
+        // 按 9:16 先算满宽目标高度；能完整展示就不裁剪，超出才裁剪
+        const fullWidthFrameH = Math.round(m.width * 16 / 9);
         rectW = m.width;
-        rectH = availableHeight;
+        rectH = Math.min(fullWidthFrameH, availableHeight);
       }
       let frameScale = rectW / 360;
 
@@ -1494,8 +1495,9 @@
             rectW = Math.floor(rectH * 9 / 16);
           }
         } else {
+          const fullWidthFrameH = Math.round(m.width * 16 / 9);
           rectW = m.width;
-          rectH = availableHeight;
+          rectH = Math.min(fullWidthFrameH, availableHeight);
         }
         frameScale = rectW / 360;
       }
