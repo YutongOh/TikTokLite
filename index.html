@@ -407,6 +407,34 @@
     .frame-offset-slider-block input[type="range"] {
       margin: 2px 0 0;
     }
+    .frame-offset-slider-block.is-disabled {
+      opacity: 0.55;
+    }
+    .frame-offset-slider-block.is-disabled .frame-offset-slider-head,
+    .frame-offset-slider-block.is-disabled #frameOffsetSliderValue {
+      color: #707070;
+    }
+    .frame-offset-slider-block input[type="range"]:disabled {
+      cursor: not-allowed;
+    }
+    .frame-offset-slider-block input[type="range"]:disabled::-webkit-slider-runnable-track {
+      background: #353535;
+      border-color: #484848;
+    }
+    .frame-offset-slider-block input[type="range"]:disabled::-webkit-slider-thumb {
+      background: #5a5a5a;
+      border: 2px solid #2a2a2a;
+      box-shadow: none;
+    }
+    .frame-offset-slider-block input[type="range"]:disabled::-moz-range-track {
+      background: #353535;
+      border-color: #484848;
+    }
+    .frame-offset-slider-block input[type="range"]:disabled::-moz-range-thumb {
+      background: #5a5a5a;
+      border: 2px solid #2a2a2a;
+      box-shadow: none;
+    }
     .mode-card-title {
       margin: 0;
       font-size: 16px;
@@ -1040,6 +1068,7 @@
     const frameOffsetSwitch = document.getElementById("frameOffsetSwitch");
     const frameOffsetSwitchLabel = document.getElementById("frameOffsetSwitchLabel");
     const frameOffsetSlider = document.getElementById("frameOffsetSlider");
+    const frameOffsetSliderBlock = document.getElementById("frameOffsetSliderBlock");
     const frameOffsetSliderValue = document.getElementById("frameOffsetSliderValue");
     const frameStyleSummaryLabel = document.getElementById("frameStyleSummaryLabel");
     const bottomGapRuleText = document.getElementById("bottomGapRuleText");
@@ -1238,6 +1267,7 @@
       const frameOffsetOn = frameOffsetSwitch.checked;
       const offsetBasePx = Number(frameOffsetSlider.value);
       frameOffsetSlider.disabled = !frameOffsetOn;
+      frameOffsetSliderBlock.classList.toggle("is-disabled", !frameOffsetOn);
       frameOffsetSliderValue.textContent = `${offsetBasePx}px`;
 
       let frameTopOffset = 0;
