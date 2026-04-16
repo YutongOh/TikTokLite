@@ -1515,16 +1515,16 @@
       const stageWidth = 360;
       const stageHeight = 800;
       const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
-      phone.style.width = `${m.width}dp`;
-      phone.style.height = `${m.height}dp`;
+      phone.style.width = `${m.width}px`;
+      phone.style.height = `${m.height}px`;
       phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
 
-      statusBar.style.height = `${m.statusBarHeight}dp`;
+      statusBar.style.height = `${m.statusBarHeight}px`;
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
       const bottomBarHeight = 24;
-      bottomBar.style.height = `${bottomBarHeight}dp`;
+      bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
       const baseBottomGap = 80;
       const minGapToBottomBar = enforceBottomGap ? baseBottomGap : 0;
@@ -1580,24 +1580,24 @@
 
       const frameTop = topBase + frameTopOffset;
       const frameRadiusPx = frameStyleOn ? 20 : 0;
-      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}dp` : "0";
+      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
         ? "当前状态：开启 · 圆角 20dp · 下移 12dp"
         : "当前状态：关闭 · 无圆角 · 不下移";
 
       const rectX = Math.floor((m.width - rectW) / 2);
-      cameraRect.style.left = `${rectX}dp`;
-      cameraRect.style.top = `${frameTop}dp`;
-      cameraRect.style.width = `${rectW}dp`;
-      cameraRect.style.height = `${rectH}dp`;
+      cameraRect.style.left = `${rectX}px`;
+      cameraRect.style.top = `${frameTop}px`;
+      cameraRect.style.width = `${rectW}px`;
+      cameraRect.style.height = `${rectH}px`;
       const fixedModeCompensationScale = 1 / scale;
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
       // 工具栏定位改为：基于系统状态栏顶端 + 28dp
-      rightTools.style.top = `${Math.round(m.statusBarHeight + 28 * uiScale)}dp`;
-      rightTools.style.width = "56dp";
-      rightTools.style.height = "354dp";
+      rightTools.style.top = `${Math.round(m.statusBarHeight + 28 * uiScale)}px`;
+      rightTools.style.width = "56px";
+      rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
       let circleSize;
       let captureScale;
@@ -1606,9 +1606,9 @@
       const captureSvgBottomPad = 0;
       // 拍摄按钮距离规则：仅在「9:16 撑满高度」模式下为 32dp，其余维持 12dp
       const circleBottomInset = frameFitMode === "cover-height" ? 32 : 12;
-      captureCircle.style.width = `${circleSize}dp`;
-      captureCircle.style.height = `${circleSize}dp`;
-      captureCircle.style.bottom = `${circleBottomInset}dp`;
+      captureCircle.style.width = `${circleSize}px`;
+      captureCircle.style.height = `${circleSize}px`;
+      captureCircle.style.bottom = `${circleBottomInset}px`;
       const tabScale = fixedModeCompensationScale;
       const tabGap = Math.max(8, 16 * tabScale);
       const tabFontSize = Math.max(9, 14 * tabScale);
@@ -1621,17 +1621,17 @@
       const tab60sWidth = Math.max(16, 26 * tabScale);
       const tabPhotoWidth = Math.max(24, 40 * tabScale);
       const tabBottomToButton = Math.round(16 * layoutScale);
-      shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}dp`);
-      shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}dp`);
-      shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}dp`);
-      shootTab.style.setProperty("--shoot-tab-letter-spacing", `${tabLetterSpacing}dp`);
-      shootTab.style.setProperty("--shoot-tab-pill-width", `${tabPillWidth}dp`);
-      shootTab.style.setProperty("--shoot-tab-pill-height", `${tabPillHeight}dp`);
-      shootTab.style.setProperty("--shoot-tab-pill-radius", `${tabPillRadius}dp`);
-      shootTab.style.setProperty("--shoot-tab-item-3m-width", `${tab3mWidth}dp`);
-      shootTab.style.setProperty("--shoot-tab-item-60s-width", `${tab60sWidth}dp`);
-      shootTab.style.setProperty("--shoot-tab-item-photo-width", `${tabPhotoWidth}dp`);
-      shootTab.style.bottom = `${circleBottomInset + circleSize + tabBottomToButton}dp`;
+      shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}px`);
+      shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}px`);
+      shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}px`);
+      shootTab.style.setProperty("--shoot-tab-letter-spacing", `${tabLetterSpacing}px`);
+      shootTab.style.setProperty("--shoot-tab-pill-width", `${tabPillWidth}px`);
+      shootTab.style.setProperty("--shoot-tab-pill-height", `${tabPillHeight}px`);
+      shootTab.style.setProperty("--shoot-tab-pill-radius", `${tabPillRadius}px`);
+      shootTab.style.setProperty("--shoot-tab-item-3m-width", `${tab3mWidth}px`);
+      shootTab.style.setProperty("--shoot-tab-item-60s-width", `${tab60sWidth}px`);
+      shootTab.style.setProperty("--shoot-tab-item-photo-width", `${tabPhotoWidth}px`);
+      shootTab.style.bottom = `${circleBottomInset + circleSize + tabBottomToButton}px`;
       const pillCenterX = shootTabCenter.offsetLeft + shootTabCenter.offsetWidth / 2;
       shootTab.style.transform = `translateX(${-pillCenterX}px)`;
       const sideGap = Math.max(0, rectX);
