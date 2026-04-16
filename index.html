@@ -1867,7 +1867,8 @@
       // 统一按实际是否存在底部黑边判断：
       // 1. 有底部黑边时，容器底边距系统 bar 顶部 89dp
       // 2. 无底部黑边时，容器底边距系统 bar 顶部 40dp
-      const circleBottomInset = bottomBarHeight + (hasBottomBlackBar ? 89 : 40);
+      const captureBottomToSystemBarTopDp = hasBottomBlackBar ? 89 : 40;
+      const circleBottomInset = bottomBarHeight + captureBottomToSystemBarTopDp;
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
@@ -1927,7 +1928,7 @@
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
