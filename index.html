@@ -133,7 +133,7 @@
       max-width: 190px;
       width: 190px;
       height: 44px;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1760,11 +1760,12 @@
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
-      // Align horizontal center with first toolbar icon column (56dp bar, right:0, origin top-right scale).
+      // Music entrance: (1) vertical midline aligned with first toolbar icon column center;
+      // (2) vertically centered on the phone (page) along the horizontal midline.
       const toolbarColumnCenterX = m.width - 28 * uiScale;
       musicEntrance.style.left = `${Math.round(toolbarColumnCenterX)}px`;
-      musicEntrance.style.top = `${Math.round(m.statusBarHeight + 12 * uiScale)}px`;
-      musicEntrance.style.transform = `translateX(-50%) scale(${uiScale})`;
+      musicEntrance.style.top = "50%";
+      musicEntrance.style.transform = `translate(-50%, -50%) scale(${uiScale})`;
       rightTools.style.top = toolbarFollowFrameOn
         ? `${Math.round(frameTop + 16 * uiScale)}px`
         : `${Math.round(m.statusBarHeight + 16 * uiScale)}px`;
