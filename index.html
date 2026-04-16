@@ -841,10 +841,10 @@
           自适应模式会根据机型尺寸动态调整侧边工具栏、拍摄按钮和 Shoot Tab。固定大小模式会锁定为 360×800 的基准视觉尺寸。
         </p>
         <div class="mode-switch-row">
-          <input id="modeSwitch" class="mode-switch" type="checkbox" aria-label="切换控件适配模式" checked />
+          <input id="modeSwitch" class="mode-switch" type="checkbox" aria-label="切换控件适配模式" />
           <span class="mode-switch-note">开：自适应 / 关：固定大小</span>
         </div>
-        <span id="modeSwitchLabel" class="mode-switch-label">当前状态：自适应</span>
+        <span id="modeSwitchLabel" class="mode-switch-label">当前状态：固定大小</span>
       </section>
       <section class="card mode-card bottom-gap-card">
         <h3 class="mode-card-title">适配底部面板</h3>
@@ -852,10 +852,10 @@
           控制画幅与系统底部条之间的最小保留空间。基准值为 360×800 下 88px：固定大小模式保持 88px，自适应模式按尺寸比例换算。
         </p>
         <div class="mode-switch-row">
-          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部88px约束" checked />
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部88px约束" />
           <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label">当前状态：启用 · 保留 88px</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label">当前状态：关闭 · 保留 0px</span>
       </section>
       <section class="card mode-card frame-style-card">
         <h3 class="mode-card-title">画幅圆角与下移</h3>
