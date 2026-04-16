@@ -822,7 +822,7 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">88px</code>，
+          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">80px</code>，
           <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
@@ -849,10 +849,10 @@
       <section class="card mode-card bottom-gap-card">
         <h3 class="mode-card-title">适配底部面板</h3>
         <p class="mode-card-desc">
-          控制画幅与系统底部条之间的最小保留空间。基准值为 360×800 下 88px：固定大小模式保持 88px，自适应模式按尺寸比例换算。
+          控制画幅与系统底部条之间的最小保留空间。基准值为 360×800 下 80px：固定大小模式保持 80px，自适应模式按尺寸比例换算。
         </p>
         <div class="mode-switch-row">
-          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部88px约束" />
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部80px约束" />
           <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
         </div>
         <span id="bottomGapSwitchLabel" class="mode-switch-label">当前状态：关闭 · 保留 0px</span>
@@ -1161,7 +1161,7 @@
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
-      const baseBottomGap = 88;
+      const baseBottomGap = 80;
       const adaptiveGapScale = Math.min(m.width / 360, m.height / 800);
       const minGapToBottomBar = enforceBottomGap
         ? (isAdaptiveMode ? Math.round(baseBottomGap * adaptiveGapScale) : baseBottomGap)
