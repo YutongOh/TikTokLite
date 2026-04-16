@@ -1582,7 +1582,7 @@
       const frameRadiusPx = frameStyleOn ? 20 : 0;
       cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}dp` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20px · 下移 12dp"
+        ? "当前状态：开启 · 圆角 20dp · 下移 12dp"
         : "当前状态：关闭 · 无圆角 · 不下移";
 
       const rectX = Math.floor((m.width - rectW) / 2);
@@ -1604,7 +1604,7 @@
       captureScale = fixedModeCompensationScale;
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
-      // 拍摄按钮距离规则：仅在「9:16 撑满高度」模式下为 32px，其余维持 12dp
+      // 拍摄按钮距离规则：仅在「9:16 撑满高度」模式下为 32dp，其余维持 12dp
       const circleBottomInset = frameFitMode === "cover-height" ? 32 : 12;
       captureCircle.style.width = `${circleSize}dp`;
       captureCircle.style.height = `${circleSize}dp`;
@@ -1661,12 +1661,12 @@
       sizeText.textContent = `${m.width}×${m.height} dp`;
       ratioText.textContent = ratio;
       rectSizeText.textContent = `${rectW}×${rectH} dp`;
-      sideGapText.textContent = sideGap > 0 ? `${sideGap}px / ${sideGap}dp` : "无";
+      sideGapText.textContent = sideGap > 0 ? `${sideGap}dp` : "无";
       bottomGapText.textContent = `${bottomGap}dp`;
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}px · 画幅顶部：${frameTop}px${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}px · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
