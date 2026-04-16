@@ -127,7 +127,7 @@
       justify-content: center;
       overflow: hidden;
     }
-    /* 返回：外区含 padding 10，内层 24×24，icon 20×17；整体左缘距屏 6dp（JS 同步垂直与 music） */
+    /* 返回：Figma Icon + Tinted 24×24，padding 10；左缘距屏 6dp（JS 同步垂直与 music） */
     .camera-back {
       position: absolute;
       left: 6px;
@@ -138,30 +138,40 @@
       gap: 10px;
       pointer-events: none;
       transform-origin: left center;
+      box-sizing: border-box;
     }
-    .camera-back-inner {
+    .camera-back-variant[data-variant="Icon"] {
       padding: 10px;
       display: flex;
       justify-content: flex-start;
       align-items: flex-start;
       gap: 20px;
       box-sizing: border-box;
+      flex: 0 0 auto;
     }
-    .camera-back-icon-slot {
+    .camera-back-icon-slot[data-style="Tinted"] {
       width: 24px;
       height: 24px;
       position: relative;
       overflow: hidden;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background-color: rgba(51, 51, 51, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 1px 4px rgba(0, 0, 0, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
     }
     .camera-back-svg {
       width: 20px;
       height: 17px;
       display: block;
       flex-shrink: 0;
+      color: #fff;
     }
     .sound-entrance {
       position: absolute;
@@ -1235,10 +1245,11 @@
               </span>
             </div>
             <div id="cameraBack" class="camera-back" aria-hidden="true">
-              <div class="camera-back-inner">
-                <div class="camera-back-icon-slot">
-                  <svg class="camera-back-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none" aria-hidden="true">
-                    <path d="M12.5 2.5L6.5 8.5L12.5 14.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <div class="camera-back-variant" data-variant="Icon">
+                <div class="camera-back-icon-slot" data-style="Tinted">
+                  <!-- 20×17dp 图标，在 24×24 Tinted 圆形容器内居中（与 Figma node 20-1667 一致） -->
+                  <svg class="camera-back-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path fill="#fff" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/>
                   </svg>
                 </div>
               </div>
