@@ -130,6 +130,7 @@
     .sound-entrance {
       position: absolute;
       left: 50%;
+      max-width: 190px;
       width: 190px;
       height: 44px;
       transform: translateX(-50%);
@@ -137,7 +138,7 @@
       align-items: center;
       justify-content: center;
       border-radius: 999px;
-      background: rgba(51, 51, 51, 0.6);
+      background-color: rgba(51, 51, 51, 0.6);
       overflow: hidden;
       z-index: 6;
       pointer-events: none;
@@ -151,15 +152,18 @@
       padding: 0 8px 0 14px;
     }
     .icontools-icon-frame {
+      position: relative;
       width: 16px;
       height: 16px;
-      flex: 0 0 auto;
-      position: relative;
+      flex-shrink: 0;
       overflow: hidden;
     }
     .icon-fill-hack {
       position: absolute;
-      inset: 4.17% 18.75% 4.17% 20.83%;
+      width: 79.17%;
+      height: 95.83%;
+      top: 4.17%;
+      left: 20.83%;
     }
     .icon-fill-hack img,
     .icon-fill-hack-wrapper img {
@@ -169,49 +173,58 @@
       object-fit: contain;
     }
     .text-wrapper {
+      position: relative;
       flex: 1 1 0;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
       color: #fff;
       font-family: "TikTok Sans", "TikTok Text", "PingFang SC", "SF Pro Text", "Segoe UI", sans-serif;
       font-size: 15px;
       font-style: normal;
       font-weight: 700;
       line-height: 1.3;
-      margin: 0;
+      letter-spacing: 0;
+      white-space: nowrap;
+      margin: -1px 0 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
     }
     .split-line {
+      position: relative;
       width: 1px;
       height: 18px;
-      flex: 0 0 auto;
+      flex-shrink: 0;
       background: rgba(255, 255, 255, 0.2);
     }
     .close {
+      display: inline-flex;
+      padding: 0 10px 0 8px;
       flex: 0 0 auto;
-      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 10px 0 8px;
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin: 0;
     }
     .icon-fill-hack-wrapper {
+      position: relative;
       width: 20px;
       height: 20px;
-      position: relative;
-      overflow: hidden;
       flex: 0 0 auto;
-    }
-    .icon-fill-hack-wrapper::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
+      overflow: hidden;
     }
     .img,
     .icon-fill-hack-wrapper .img {
       position: absolute;
-      inset: 24.34% 24.35% 24.35% 24.35%;
+      width: 75.65%;
+      height: 75.66%;
+      top: 24.34%;
+      left: 24.35%;
     }
 
     .camera-rect {
