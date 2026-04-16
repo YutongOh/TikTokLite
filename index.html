@@ -1198,6 +1198,22 @@
                 <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/683dc837-e14e-4a09-8e08-be31b80d7a1b" alt="" /></span>
               </span>
             </div>
+            <div id="musicEntrance" class="sound-entrance" aria-hidden="true">
+              <div class="sound-name">
+                <div class="icontools-icon-frame">
+                  <div class="icon-fill-hack">
+                    <img src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
+                  </div>
+                </div>
+                <p class="text-wrapper">Fly me to the moon an</p>
+              </div>
+              <div class="split-line"></div>
+              <div class="close">
+                <div class="icon-fill-hack-wrapper">
+                  <img class="img" src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
+                </div>
+              </div>
+            </div>
             <div id="cameraRect" class="camera-rect">
               <video
                 id="cameraVideo"
@@ -1263,22 +1279,6 @@
             </div>
           </div>
             <div id="bottomBar" class="bottom-bar"></div>
-          </div>
-        </div>
-        <div id="musicEntrance" class="sound-entrance" aria-hidden="true">
-          <div class="sound-name">
-            <div class="icontools-icon-frame">
-              <div class="icon-fill-hack">
-                <img src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
-              </div>
-            </div>
-            <p class="text-wrapper">Fly me to the moon an</p>
-          </div>
-          <div class="split-line"></div>
-          <div class="close">
-            <div class="icon-fill-hack-wrapper">
-              <img class="img" src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
-            </div>
           </div>
         </div>
         <div id="gapLeftTag" class="gap-tag gap-left gap-outside" hidden>左间距 0dp</div>
@@ -1685,7 +1685,6 @@
       const stageWidth = 360;
       const stageHeight = 800;
       const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
-      const phoneTopInShell = (stageHeight - m.height * scale) / 2;
       phone.style.width = `${m.width}px`;
       phone.style.height = `${m.height}px`;
       phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
@@ -1694,8 +1693,6 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      // Sound entrance lives in shell coordinates; align with scaled status bar.
-      musicEntrance.style.top = `${phoneTopInShell + (m.statusBarHeight + 12) * scale}px`;
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
@@ -1763,6 +1760,9 @@
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
+      // Keep music entrance on same adaptation strategy as toolbar.
+      musicEntrance.style.top = `${Math.round(m.statusBarHeight + 12 * uiScale)}px`;
+      musicEntrance.style.transform = `translateX(-50%) scale(${uiScale})`;
       rightTools.style.top = toolbarFollowFrameOn
         ? `${Math.round(frameTop + 16 * uiScale)}px`
         : `${Math.round(m.statusBarHeight + 16 * uiScale)}px`;
