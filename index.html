@@ -150,10 +150,20 @@
       gap: 4px;
       padding: 0 8px 0 14px;
     }
-    .music-entrance-icon16 {
+    .music-entrance-icon-frame16 {
       width: 16px;
       height: 16px;
       flex: 0 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .music-entrance-fill-note {
+      position: absolute;
+      inset: 4.17% 18.75% 4.17% 20.83%;
+    }
+    .music-entrance-fill-note img {
+      width: 100%;
+      height: 100%;
       display: block;
     }
     .music-entrance-title {
@@ -168,6 +178,7 @@
       font-style: normal;
       font-weight: 700;
       line-height: 1.3;
+      margin: 0;
     }
     .music-entrance-divider {
       width: 1px;
@@ -182,9 +193,20 @@
       justify-content: center;
       padding: 0 10px 0 8px;
     }
-    .music-entrance-icon20 {
+    .music-entrance-icon-frame20 {
       width: 20px;
       height: 20px;
+      position: relative;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .music-entrance-fill-close {
+      position: absolute;
+      inset: 24.34% 24.35% 24.35% 24.35%;
+    }
+    .music-entrance-fill-close img {
+      width: 100%;
+      height: 100%;
       display: block;
     }
 
@@ -1138,12 +1160,20 @@
             </div>
             <div id="musicEntrance" class="music-entrance" aria-hidden="true">
               <div class="music-entrance-main">
-                <img class="music-entrance-icon16" src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
-                <span class="music-entrance-title">Fly me to the moon an</span>
+                <div class="music-entrance-icon-frame16" aria-hidden="true">
+                  <div class="music-entrance-fill-note">
+                    <img src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
+                  </div>
+                </div>
+                <p class="music-entrance-title">Fly me to the moon an</p>
               </div>
               <div class="music-entrance-divider"></div>
               <div class="music-entrance-close">
-                <img class="music-entrance-icon20" src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
+                <div class="music-entrance-icon-frame20" aria-hidden="true">
+                  <div class="music-entrance-fill-close">
+                    <img src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
+                  </div>
+                </div>
               </div>
             </div>
 
