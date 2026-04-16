@@ -1201,7 +1201,12 @@
         ? Math.max(minAdaptiveControlScale, frameScale)
         : fixedModeCompensationScale;
       const circleSize = Math.round(86 * captureScale);
-      const circleBottomInset = Math.round(12 * layoutScale);
+      // SVG viewBox 102×102：白圈下缘约 y=92，viewBox 底 102，容器底到可见按钮下缘多出约 (10/102)*circleSize
+      const captureSvgBottomPad = circleSize * (10 / 102);
+      const circleBottomInset = Math.max(
+        0,
+        Math.round(12 * layoutScale - captureSvgBottomPad)
+      );
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
