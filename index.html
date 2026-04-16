@@ -129,7 +129,7 @@
     }
     .sound-entrance {
       position: absolute;
-      right: auto;
+      left: 50%;
       max-width: 190px;
       width: 190px;
       height: 44px;
@@ -1760,15 +1760,16 @@
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
-      // Music entrance: (1) vertical midline aligned with first toolbar icon column center;
-      // (2) vertically centered on the phone (page) along the horizontal midline.
-      const toolbarColumnCenterX = m.width - 28 * uiScale;
-      musicEntrance.style.left = `${Math.round(toolbarColumnCenterX)}px`;
-      musicEntrance.style.top = "50%";
+      const toolbarTop = toolbarFollowFrameOn
+        ? Math.round(frameTop + 16 * uiScale)
+        : Math.round(m.statusBarHeight + 16 * uiScale);
+      // Music entrance: (1) horizontal — page center (vertical midline of screen);
+      // (2) vertical — horizontal midline aligned with first toolbar icon-wrap (padding-top 4 + icon 28/2).
+      const firstIconCenterY = toolbarTop + 4 + 14;
+      musicEntrance.style.left = "50%";
+      musicEntrance.style.top = `${firstIconCenterY}px`;
       musicEntrance.style.transform = `translate(-50%, -50%) scale(${uiScale})`;
-      rightTools.style.top = toolbarFollowFrameOn
-        ? `${Math.round(frameTop + 16 * uiScale)}px`
-        : `${Math.round(m.statusBarHeight + 16 * uiScale)}px`;
+      rightTools.style.top = `${toolbarTop}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
