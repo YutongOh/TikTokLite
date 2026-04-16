@@ -1188,6 +1188,7 @@
       const frameScale = rectW / 360;
       const minAdaptiveControlScale = 0.82;
       const fixedModeCompensationScale = 1 / scale;
+      const layoutScale = isAdaptiveMode ? frameScale : fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = isAdaptiveMode
         ? Math.max(minAdaptiveControlScale, Math.min(m.width / 360, m.height / 800))
@@ -1199,8 +1200,8 @@
       const captureScale = isAdaptiveMode
         ? Math.max(minAdaptiveControlScale, frameScale)
         : fixedModeCompensationScale;
-      const circleSize = Math.round(102 * captureScale);
-      const circleBottomInset = Math.round(12 * captureScale);
+      const circleSize = Math.round(86 * captureScale);
+      const circleBottomInset = Math.round(12 * layoutScale);
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
@@ -1217,7 +1218,7 @@
       const tab3mWidth = Math.max(14, 22 * tabScale);
       const tab60sWidth = Math.max(16, 26 * tabScale);
       const tabPhotoWidth = Math.max(24, 40 * tabScale);
-      const tabBottomToButton = Math.max(8, Math.round(16 * tabScale));
+      const tabBottomToButton = Math.round(16 * layoutScale);
       shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}px`);
       shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}px`);
       shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}px`);
