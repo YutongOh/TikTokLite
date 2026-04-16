@@ -1607,13 +1607,13 @@
       const fullWidthFrameH = Math.round(m.width * 16 / 9);
       const hasVerticalCropInCoverWidth = frameFitMode === "cover-width" && fullWidthFrameH > availableHeight;
       // 拍摄按钮距离规则：
-      // 1. 撑满宽度且发生裁剪（无底部黑边）时，容器底边距屏幕底部 40dp
-      // 2. 撑满宽度且不裁剪（有底部黑边）时，容器底边距屏幕底部 89dp
+      // 1. 撑满宽度且发生裁剪（无底部黑边）时，容器底边距系统 bar 顶部 40dp
+      // 2. 撑满宽度且不裁剪（有底部黑边）时，容器底边距系统 bar 顶部 89dp
       // 3. 撑满高度时，维持距画幅 32dp 的既有规则
       // 4. 其他情况维持 12dp
       const circleBottomInset =
         frameFitMode === "cover-width"
-          ? (hasVerticalCropInCoverWidth ? 40 : 89)
+          ? bottomBarHeight + (hasVerticalCropInCoverWidth ? 40 : 89)
           : frameFitMode === "cover-height"
             ? 32
             : 12;
