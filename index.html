@@ -167,6 +167,11 @@
       height: auto;
       max-width: none;
     }
+    .camera-back-arrow svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
     .sound-entrance {
       position: absolute;
       left: 50%;
@@ -1241,7 +1246,11 @@
             <div id="cameraBack" class="camera-back" aria-hidden="true">
               <div class="camera-back-variant" data-variant="Icon">
                 <div class="camera-back-icon-slot" data-style="Tinted">
-                  <img class="camera-back-arrow" src="https://www.figma.com/api/mcp/asset/d19e4670-f470-4c33-9df6-f3a2cca3e749" alt="" />
+                  <div class="camera-back-arrow" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none">
+                      <path d="M12.5 2.5L6.5 8.5L12.5 14.5" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
