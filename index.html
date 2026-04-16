@@ -1143,36 +1143,15 @@
         <span id="bottomGapSwitchLabel" class="mode-switch-label">当前状态：关闭 · 保留 0px</span>
       </section>
       <section class="card mode-card frame-style-card">
-        <h3 class="mode-card-title">画幅圆角与下移</h3>
+        <h3 class="mode-card-title">新增圆角&下移画幅</h3>
         <p class="mode-card-desc">
-          圆角与下移可单独开关。圆角固定 20px。下移距离用下方滑块设定，步长 4px，范围 8～64。
+          控制画幅圆角与位置。开启后画幅增加 20px 圆角并整体下移 12px；关闭后画幅无圆角且不下移。
         </p>
         <div class="mode-switch-row">
-          <input id="frameRadiusSwitch" class="mode-switch" type="checkbox" aria-label="是否启用画幅圆角" />
-          <span class="mode-switch-note">是否有圆角</span>
+          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="切换圆角与下移画幅" />
+          <span class="mode-switch-note">开：圆角 20px + 下移 12px / 关：无圆角不下移</span>
         </div>
-        <span id="frameRadiusSwitchLabel" class="mode-switch-label">圆角：关</span>
-        <div class="mode-switch-row">
-          <input id="frameOffsetSwitch" class="mode-switch" type="checkbox" aria-label="是否下移画幅" />
-          <span class="mode-switch-note">是否下移</span>
-        </div>
-        <span id="frameOffsetSwitchLabel" class="mode-switch-label">下移：关</span>
-        <div id="frameOffsetSliderBlock" class="frame-offset-slider-block">
-          <div class="frame-offset-slider-head">
-            <span>下移距离（基准 px，步长 4）</span>
-            <span id="frameOffsetSliderValue">12px</span>
-          </div>
-          <input
-            id="frameOffsetSlider"
-            type="range"
-            min="8"
-            max="64"
-            step="4"
-            value="12"
-            aria-label="画幅下移距离"
-          />
-        </div>
-        <span id="frameStyleSummaryLabel" class="mode-switch-label frame-style-summary">圆角：关 · 下移：关 · 基准 12px</span>
+        <span id="frameStyleSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 无圆角 · 不下移</span>
       </section>
     </aside>
   </main>
@@ -1295,14 +1274,8 @@
     const frameFitSwitchLabel = document.getElementById("frameFitSwitchLabel");
     const bottomGapSwitch = document.getElementById("bottomGapSwitch");
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
-    const frameRadiusSwitch = document.getElementById("frameRadiusSwitch");
-    const frameRadiusSwitchLabel = document.getElementById("frameRadiusSwitchLabel");
-    const frameOffsetSwitch = document.getElementById("frameOffsetSwitch");
-    const frameOffsetSwitchLabel = document.getElementById("frameOffsetSwitchLabel");
-    const frameOffsetSlider = document.getElementById("frameOffsetSlider");
-    const frameOffsetSliderBlock = document.getElementById("frameOffsetSliderBlock");
-    const frameOffsetSliderValue = document.getElementById("frameOffsetSliderValue");
-    const frameStyleSummaryLabel = document.getElementById("frameStyleSummaryLabel");
+    const frameStyleSwitch = document.getElementById("frameStyleSwitch");
+    const frameStyleSwitchLabel = document.getElementById("frameStyleSwitchLabel");
     const bottomGapRuleText = document.getElementById("bottomGapRuleText");
     const bottomBar = document.getElementById("bottomBar");
     const gapLeftTag = document.getElementById("gapLeftTag");
@@ -1507,16 +1480,11 @@
       }
       let frameScale = rectW / 360;
 
-      const frameRadiusOn = frameRadiusSwitch.checked;
-      const frameOffsetOn = frameOffsetSwitch.checked;
-      const offsetBasePx = Number(frameOffsetSlider.value);
-      frameOffsetSlider.disabled = !frameOffsetOn;
-      frameOffsetSliderBlock.classList.toggle("is-disabled", !frameOffsetOn);
-      frameOffsetSliderValue.textContent = `${offsetBasePx}px`;
+      const frameStyleOn = frameStyleSwitch.checked;
 
       let frameTopOffset = 0;
-      if (frameOffsetOn) {
-        frameTopOffset = offsetBasePx;
+      if (frameStyleOn) {
+        frameTopOffset = 12;
         availableHeight = bottomBarTop - minGapToBottomBar - topBase - frameTopOffset;
         rectW = m.width;
         rectH = Math.round(rectW * 16 / 9);
@@ -1533,20 +1501,11 @@
       }
 
       const frameTop = topBase + frameTopOffset;
-      const frameRadiusPx = frameRadiusOn ? 20 : 0;
+      const frameRadiusPx = frameStyleOn ? 20 : 0;
       cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
-
-      frameRadiusSwitchLabel.textContent = frameRadiusOn
-        ? `圆角：开 · ${frameRadiusPx}px`
-        : "圆角：关";
-      frameOffsetSwitchLabel.textContent = frameOffsetOn
-        ? `下移：开 · 实际 ${frameTopOffset}px（基准 ${offsetBasePx}px）`
-        : "下移：关";
-      frameStyleSummaryLabel.textContent = [
-        `圆角：${frameRadiusOn ? "开" : "关"}`,
-        `下移：${frameOffsetOn ? "开" : "关"}`,
-        `基准 ${offsetBasePx}px`,
-      ].join(" · ");
+      frameStyleSwitchLabel.textContent = frameStyleOn
+        ? "当前状态：开启 · 圆角 20px · 下移 12px"
+        : "当前状态：关闭 · 无圆角 · 不下移";
 
       const rectX = Math.floor((m.width - rectW) / 2);
       cameraRect.style.left = `${rectX}px`;
@@ -1658,9 +1617,7 @@
     modelSlider.addEventListener("input", render);
     frameFitSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
-    frameRadiusSwitch.addEventListener("input", render);
-    frameOffsetSwitch.addEventListener("input", render);
-    frameOffsetSlider.addEventListener("input", render);
+    frameStyleSwitch.addEventListener("input", render);
 
     setupRangeTicks();
     syncModelSliderByRange();
