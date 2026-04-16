@@ -1197,10 +1197,15 @@
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
-      const captureScale = isAdaptiveMode
-        ? Math.max(minAdaptiveControlScale, frameScale)
-        : fixedModeCompensationScale;
-      const circleSize = Math.round(86 * captureScale);
+      let circleSize;
+      let captureScale;
+      if (isAdaptiveMode) {
+        captureScale = Math.max(minAdaptiveControlScale, frameScale);
+        circleSize = Math.round(86 * captureScale);
+      } else {
+        captureScale = fixedModeCompensationScale;
+        circleSize = 86 / scale;
+      }
       // SVG viewBox 102×102：白圈下缘约 y=92，viewBox 底 102，容器底到可见按钮下缘多出约 (10/102)*circleSize
       const captureSvgBottomPad = circleSize * (10 / 102);
       const circleBottomInset = Math.max(
