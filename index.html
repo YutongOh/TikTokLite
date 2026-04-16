@@ -1367,7 +1367,7 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">80dp</code>，
+          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">68dp</code>，
           <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
@@ -1424,7 +1424,7 @@
           <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部80px约束" />
           <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 保留 56dp</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 保留 68dp</span>
       </section>
     </aside>
   </main>
@@ -1773,7 +1773,7 @@
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
-      const defaultBottomGap = 56;
+      const defaultBottomGap = 68;
       const expandedBottomGap = 80;
       const minGapToBottomBar = enforceBottomGap ? expandedBottomGap : defaultBottomGap;
       bottomGapSwitchLabel.textContent = enforceBottomGap
