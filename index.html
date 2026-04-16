@@ -133,7 +133,8 @@
       max-width: 190px;
       width: 190px;
       height: 44px;
-      transform: translateX(-50%);
+      transform: translateX(-50%) scale(var(--sound-entrance-scale, 1));
+      transform-origin: top center;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1659,7 +1660,9 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      musicEntrance.style.top = `${m.statusBarHeight + 12}px`;
+      // Keep sound entrance visually fixed across model scaling.
+      musicEntrance.style.setProperty("--sound-entrance-scale", `${1 / scale}`);
+      musicEntrance.style.top = `${(m.statusBarHeight + 12) / scale}px`;
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
