@@ -127,7 +127,7 @@
       justify-content: center;
       overflow: hidden;
     }
-    /* 返回：Figma Icon + Tinted 24×24，padding 10；左缘距屏 6dp（JS 同步垂直与 music） */
+    /* 返回：Figma node 20-1667 — Icon / Tinted 24×24 + padding 10；左缘距屏 6dp（JS 同步垂直与 music） */
     .camera-back {
       position: absolute;
       left: 6px;
@@ -149,19 +149,23 @@
       box-sizing: border-box;
       flex: 0 0 auto;
     }
+    /* Tinted：圆角矩形容器 + 玻璃叠层（对齐 Figma「Tinted / on media」常见 token，非正圆） */
     .camera-back-icon-slot[data-style="Tinted"] {
       width: 24px;
       height: 24px;
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
-      border-radius: 50%;
-      background-color: rgba(51, 51, 51, 0.6);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      border-radius: 6px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%),
+        rgba(22, 24, 35, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
       box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-        0 1px 4px rgba(0, 0, 0, 0.25);
+        0 1px 2px rgba(22, 24, 35, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -171,7 +175,7 @@
       height: 17px;
       display: block;
       flex-shrink: 0;
-      color: #fff;
+      overflow: visible;
     }
     .sound-entrance {
       position: absolute;
@@ -1247,9 +1251,15 @@
             <div id="cameraBack" class="camera-back" aria-hidden="true">
               <div class="camera-back-variant" data-variant="Icon">
                 <div class="camera-back-icon-slot" data-style="Tinted">
-                  <!-- 20×17dp 图标，在 24×24 Tinted 圆形容器内居中（与 Figma node 20-1667 一致） -->
-                  <svg class="camera-back-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path fill="#fff" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/>
+                  <!-- 20×17 描边箭头，在 24×24 Tinted 内居中 -->
+                  <svg class="camera-back-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none" aria-hidden="true">
+                    <path
+                      d="M12.25 2.75L6.75 8.5L12.25 14.25"
+                      stroke="#fff"
+                      stroke-width="1.75"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                 </div>
               </div>
