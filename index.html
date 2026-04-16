@@ -1324,10 +1324,10 @@
         </div>
         <div class="mode-switch-row">
           <input id="toolbarFollowFrameSwitch" class="mode-switch" type="checkbox" aria-label="切换工具栏是否跟随画幅顶部" />
-          <span class="mode-switch-note">开：工具栏距画幅顶端 16dp / 关：工具栏距顶部 bar 28dp</span>
+          <span class="mode-switch-note">开：工具栏距画幅顶端 16dp / 关：工具栏距顶部 bar 16dp</span>
         </div>
         <span id="frameStyleSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 无圆角 · 不居中</span>
-        <span id="toolbarFollowFrameSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 距顶部 bar 28dp</span>
+        <span id="toolbarFollowFrameSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 距顶部 bar 16dp</span>
       </section>
 
       <section class="card mode-card switch-style-card">
@@ -1723,7 +1723,7 @@
       const toolbarFollowFrameOn = toolbarFollowFrameSwitch.checked;
       toolbarFollowFrameSwitchLabel.textContent = toolbarFollowFrameOn
         ? "当前状态：开启 · 距画幅顶端 16dp"
-        : "当前状态：关闭 · 距顶部 bar 28dp";
+        : "当前状态：关闭 · 距顶部 bar 16dp";
 
       const rectX = Math.floor((m.width - rectW) / 2);
       cameraRect.style.left = `${rectX}px`;
@@ -1736,7 +1736,7 @@
       const uiScale = fixedModeCompensationScale;
       rightTools.style.top = toolbarFollowFrameOn
         ? `${Math.round(frameTop + 16 * uiScale)}px`
-        : `${Math.round(m.statusBarHeight + 28 * uiScale)}px`;
+        : `${Math.round(m.statusBarHeight + 16 * uiScale)}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
       rightTools.style.transform = `scale(${uiScale})`;
