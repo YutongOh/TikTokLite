@@ -127,6 +127,66 @@
       justify-content: center;
       overflow: hidden;
     }
+    .music-entrance {
+      position: absolute;
+      left: 50%;
+      width: 190px;
+      height: 44px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(51, 51, 51, 0.6);
+      overflow: hidden;
+      z-index: 6;
+      pointer-events: none;
+    }
+    .music-entrance-main {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 8px 0 14px;
+    }
+    .music-entrance-icon16 {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      display: block;
+    }
+    .music-entrance-title {
+      flex: 1 1 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #fff;
+      font-family: "TikTok Sans", "TikTok Text", "PingFang SC", "SF Pro Text", "Segoe UI", sans-serif;
+      font-size: 15px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .music-entrance-divider {
+      width: 1px;
+      height: 18px;
+      flex: 0 0 auto;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .music-entrance-close {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px 0 8px;
+    }
+    .music-entrance-icon20 {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
 
     .camera-rect {
       position: absolute;
@@ -1076,6 +1136,16 @@
                 <span class="status-icon-box"><img class="status-icon-svg" src="https://www.figma.com/api/mcp/asset/683dc837-e14e-4a09-8e08-be31b80d7a1b" alt="" /></span>
               </span>
             </div>
+            <div id="musicEntrance" class="music-entrance" aria-hidden="true">
+              <div class="music-entrance-main">
+                <img class="music-entrance-icon16" src="https://www.figma.com/api/mcp/asset/300f7272-5a20-4de1-ae75-586f22f1412f" alt="" />
+                <span class="music-entrance-title">Fly me to the moon an</span>
+              </div>
+              <div class="music-entrance-divider"></div>
+              <div class="music-entrance-close">
+                <img class="music-entrance-icon20" src="https://www.figma.com/api/mcp/asset/80a720e8-b94d-4356-b35f-6313b00d1609" alt="" />
+              </div>
+            </div>
 
             <div id="cameraRect" class="camera-rect">
               <video
@@ -1342,6 +1412,7 @@
     const phoneShell = document.getElementById("phoneShell");
     const phone = document.getElementById("phone");
     const statusBar = document.getElementById("statusBar");
+    const musicEntrance = document.getElementById("musicEntrance");
     const cameraRect = document.getElementById("cameraRect");
     const rightTools = document.getElementById("rightTools");
     const cameraVideo = document.getElementById("cameraVideo");
@@ -1543,6 +1614,7 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
+      musicEntrance.style.top = `${m.statusBarHeight + 12}px`;
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
