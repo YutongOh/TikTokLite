@@ -1367,7 +1367,7 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">68dp</code>，
+          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">0dp</code>，
           <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
@@ -1419,67 +1419,68 @@
       </section>
 
       <section class="card mode-card bottom-gap-card switch-style-card">
-        <h3 class="mode-card-title">适配底部面板</h3>
+        <h3 class="mode-card-title">适配编辑页</h3>
         <div class="mode-switch-row">
           <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="切换底部80px约束" />
-          <span class="mode-switch-note">开：启用底部保留 / 关：允许不保留</span>
+          <span class="mode-switch-note">开：保留 68dp / 关：不做保留</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 保留 68dp</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 不做保留</span>
       </section>
     </aside>
   </main>
 
   <script>
+    /** 典型 densityDpi（GSM Arena / 常见档位）；用于 px = round(dp × densityDpi / 160) */
     const RAW_MODELS = [
-      { name: "Galaxy Ace 4", width: 320, height: 533, official: "https://www.gsmarena.com/samsung_galaxy_ace_4-6439.php" },
-      { name: "Xperia E3", width: 320, height: 533, official: "https://www.gsmarena.com/sony_xperia_e3-6600.php" },
-      { name: "Moto E (2015)", width: 360, height: 640, official: "https://www.gsmarena.com/motorola_moto_e_(2nd_gen)-6986.php" },
-      { name: "Galaxy J2", width: 360, height: 640, official: "https://www.gsmarena.com/samsung_galaxy_j2-7437.php" },
-      { name: "Nokia 8", width: 360, height: 720, official: "https://www.gsmarena.com/nokia_8-8522.php" },
-      { name: "OnePlus 5", width: 360, height: 720, official: "https://www.gsmarena.com/oneplus_5-8647.php" },
-      { name: "Galaxy S8", width: 360, height: 740, official: "https://www.gsmarena.com/samsung_galaxy_s8-8161.php" },
-      { name: "Galaxy S9", width: 360, height: 740, official: "https://www.gsmarena.com/samsung_galaxy_s9-8966.php" },
-      { name: "Galaxy Note9", width: 360, height: 740, official: "https://www.gsmarena.com/samsung_galaxy_note9-9163.php" },
-      { name: "Galaxy S10", width: 360, height: 760, official: "https://www.gsmarena.com/samsung_galaxy_s10-9536.php" },
-      { name: "Galaxy S23", width: 360, height: 780, official: "https://www.gsmarena.com/samsung_galaxy_s23-12082.php" },
-      { name: "Galaxy S24", width: 360, height: 780, official: "https://www.gsmarena.com/samsung_galaxy_s24-12773.php" },
-      { name: "Galaxy S21", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s21_5g-10626.php" },
-      { name: "Galaxy S22", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s22_5g-11253.php" },
-      { name: "Galaxy S25", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s25-13610.php" },
-      { name: "Galaxy S21 Ultra", width: 384, height: 854, official: "https://www.gsmarena.com/samsung_galaxy_s21_ultra_5g-10596.php" },
-      { name: "Galaxy S22 Ultra", width: 384, height: 854, official: "https://www.gsmarena.com/samsung_galaxy_s22_ultra_5g-11251.php" },
-      { name: "Galaxy S24+", width: 384, height: 854, official: "https://www.gsmarena.com/samsung_galaxy_s24+-12772.php" },
-      { name: "Pixel 3", width: 393, height: 786, official: "https://www.gsmarena.com/google_pixel_3-9256.php" },
-      { name: "Pixel 3a", width: 393, height: 808, official: "https://www.gsmarena.com/google_pixel_3a-9408.php" },
-      { name: "Pixel 4", width: 393, height: 830, official: "https://www.gsmarena.com/google_pixel_4-9896.php" },
-      { name: "Pixel 4a", width: 393, height: 851, official: "https://www.gsmarena.com/google_pixel_4a-10123.php" },
-      { name: "Pixel 5", width: 393, height: 851, official: "https://www.gsmarena.com/google_pixel_5-10386.php" },
-      { name: "Xiaomi Redmi Note 9 Pro", width: 393, height: 873, official: "https://www.gsmarena.com/xiaomi_redmi_note_9_pro-10217.php" },
-      { name: "Xiaomi 13", width: 393, height: 873, official: "https://www.gsmarena.com/xiaomi_13-12013.php" },
-      { name: "Galaxy S20+", width: 412, height: 869, official: "https://www.gsmarena.com/samsung_galaxy_s20+-10041.php" },
-      { name: "Galaxy Note20 Ultra", width: 412, height: 883, official: "https://www.gsmarena.com/samsung_galaxy_note20_ultra_5g-10261.php" },
-      { name: "Galaxy S25 Ultra", width: 412, height: 891, official: "https://www.gsmarena.com/samsung_galaxy_s25_ultra-13611.php" },
-      { name: "OnePlus 8 Pro", width: 412, height: 906, official: "https://www.gsmarena.com/oneplus_8_pro-9919.php" },
-      { name: "OnePlus 8T", width: 412, height: 914, official: "https://www.gsmarena.com/oneplus_8t-10420.php" },
-      { name: "Pixel 7", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_7-11903.php" },
-      { name: "Pixel 7 Pro", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_7_pro-11908.php" },
-      { name: "Pixel 8", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_8-12546.php" },
-      { name: "Pixel 9", width: 412, height: 915, official: "https://www.gsmarena.com/google_pixel_9-13219.php" },
-      { name: "Xiaomi 14", width: 412, height: 915, official: "https://www.gsmarena.com/xiaomi_14-12626.php" },
-      { name: "OnePlus 12", width: 412, height: 918, official: "https://www.gsmarena.com/oneplus_12-12725.php" },
-      { name: "Pixel 8 Pro", width: 430, height: 932, official: "https://www.gsmarena.com/google_pixel_8_pro-12545.php" },
-      { name: "Pixel 9 Pro XL", width: 430, height: 932, official: "https://www.gsmarena.com/google_pixel_9_pro_xl-13217.php" },
-      { name: "Tecno Spark Go 2024", width: 431, height: 966, official: "https://www.gsmarena.com/tecno_spark_go_2024-12704.php" },
-      { name: "Xiaomi Redmi 9A", width: 429, height: 952, official: "https://www.gsmarena.com/xiaomi_redmi_9a-10279.php" },
-      { name: "Samsung Galaxy A03 Core", width: 426, height: 947, official: "https://www.gsmarena.com/samsung_galaxy_a03_core-11275.php" },
-      { name: "Samsung Galaxy A05", width: 440, height: 977, official: "https://www.gsmarena.com/samsung_galaxy_a05-12583.php" },
-      { name: "Samsung Galaxy A15", width: 436, height: 992, official: "https://www.gsmarena.com/samsung_galaxy_a15-12637.php" },
-      { name: "Infinix Smart 5", width: 433, height: 964, official: "https://www.gsmarena.com/infinix_smart_5-10612.php" },
-      { name: "Samsung Galaxy A10s", width: 426, height: 897, official: "https://www.gsmarena.com/samsung_galaxy_a10s-9798.php" },
-      { name: "Tecno Spark 30C", width: 438, height: 974, official: "https://www.gsmarena.com/tecno_spark_30c-13361.php" },
-      { name: "Infinix Hot 40i", width: 429, height: 960, official: "https://www.gsmarena.com/infinix_hot_40i-12733.php" },
-      { name: "ROG Phone 8 Pro", width: 450, height: 1000, official: "https://www.gsmarena.com/asus_rog_phone_8_pro-12729.php" },
-      { name: "Sony Xperia 1 V", width: 450, height: 1000, official: "https://www.gsmarena.com/sony_xperia_1_v-12263.php" },
+      { name: "Galaxy Ace 4", width: 320, height: 533, densityDpi: 240, official: "https://www.gsmarena.com/samsung_galaxy_ace_4-6439.php" },
+      { name: "Xperia E3", width: 320, height: 533, densityDpi: 240, official: "https://www.gsmarena.com/sony_xperia_e3-6600.php" },
+      { name: "Moto E (2015)", width: 360, height: 640, densityDpi: 240, official: "https://www.gsmarena.com/motorola_moto_e_(2nd_gen)-6986.php" },
+      { name: "Galaxy J2", width: 360, height: 640, densityDpi: 320, official: "https://www.gsmarena.com/samsung_galaxy_j2-7437.php" },
+      { name: "Nokia 8", width: 360, height: 720, densityDpi: 480, official: "https://www.gsmarena.com/nokia_8-8522.php" },
+      { name: "OnePlus 5", width: 360, height: 720, densityDpi: 420, official: "https://www.gsmarena.com/oneplus_5-8647.php" },
+      { name: "Galaxy S8", width: 360, height: 740, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s8-8161.php" },
+      { name: "Galaxy S9", width: 360, height: 740, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s9-8966.php" },
+      { name: "Galaxy Note9", width: 360, height: 740, densityDpi: 420, official: "https://www.gsmarena.com/samsung_galaxy_note9-9163.php" },
+      { name: "Galaxy S10", width: 360, height: 760, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s10-9536.php" },
+      { name: "Galaxy S23", width: 360, height: 780, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s23-12082.php" },
+      { name: "Galaxy S24", width: 360, height: 780, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s24-12773.php" },
+      { name: "Galaxy S21", width: 360, height: 800, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s21_5g-10626.php" },
+      { name: "Galaxy S22", width: 360, height: 800, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s22_5g-11253.php" },
+      { name: "Galaxy S25", width: 360, height: 800, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s25-13610.php" },
+      { name: "Galaxy S21 Ultra", width: 384, height: 854, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s21_ultra_5g-10596.php" },
+      { name: "Galaxy S22 Ultra", width: 384, height: 854, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s22_ultra_5g-11251.php" },
+      { name: "Galaxy S24+", width: 384, height: 854, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s24+-12772.php" },
+      { name: "Pixel 3", width: 393, height: 786, densityDpi: 440, official: "https://www.gsmarena.com/google_pixel_3-9256.php" },
+      { name: "Pixel 3a", width: 393, height: 808, densityDpi: 440, official: "https://www.gsmarena.com/google_pixel_3a-9408.php" },
+      { name: "Pixel 4", width: 393, height: 830, densityDpi: 440, official: "https://www.gsmarena.com/google_pixel_4-9896.php" },
+      { name: "Pixel 4a", width: 393, height: 851, densityDpi: 440, official: "https://www.gsmarena.com/google_pixel_4a-10123.php" },
+      { name: "Pixel 5", width: 393, height: 851, densityDpi: 440, official: "https://www.gsmarena.com/google_pixel_5-10386.php" },
+      { name: "Xiaomi Redmi Note 9 Pro", width: 393, height: 873, densityDpi: 440, official: "https://www.gsmarena.com/xiaomi_redmi_note_9_pro-10217.php" },
+      { name: "Xiaomi 13", width: 393, height: 873, densityDpi: 480, official: "https://www.gsmarena.com/xiaomi_13-12013.php" },
+      { name: "Galaxy S20+", width: 412, height: 869, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s20+-10041.php" },
+      { name: "Galaxy Note20 Ultra", width: 412, height: 883, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_note20_ultra_5g-10261.php" },
+      { name: "Galaxy S25 Ultra", width: 412, height: 891, densityDpi: 480, official: "https://www.gsmarena.com/samsung_galaxy_s25_ultra-13611.php" },
+      { name: "OnePlus 8 Pro", width: 412, height: 906, densityDpi: 480, official: "https://www.gsmarena.com/oneplus_8_pro-9919.php" },
+      { name: "OnePlus 8T", width: 412, height: 914, densityDpi: 480, official: "https://www.gsmarena.com/oneplus_8t-10420.php" },
+      { name: "Pixel 7", width: 412, height: 915, densityDpi: 420, official: "https://www.gsmarena.com/google_pixel_7-11903.php" },
+      { name: "Pixel 7 Pro", width: 412, height: 915, densityDpi: 420, official: "https://www.gsmarena.com/google_pixel_7_pro-11908.php" },
+      { name: "Pixel 8", width: 412, height: 915, densityDpi: 420, official: "https://www.gsmarena.com/google_pixel_8-12546.php" },
+      { name: "Pixel 9", width: 412, height: 915, densityDpi: 420, official: "https://www.gsmarena.com/google_pixel_9-13219.php" },
+      { name: "Xiaomi 14", width: 412, height: 915, densityDpi: 480, official: "https://www.gsmarena.com/xiaomi_14-12626.php" },
+      { name: "OnePlus 12", width: 412, height: 918, densityDpi: 480, official: "https://www.gsmarena.com/oneplus_12-12725.php" },
+      { name: "Pixel 8 Pro", width: 430, height: 932, densityDpi: 480, official: "https://www.gsmarena.com/google_pixel_8_pro-12545.php" },
+      { name: "Pixel 9 Pro XL", width: 430, height: 932, densityDpi: 480, official: "https://www.gsmarena.com/google_pixel_9_pro_xl-13217.php" },
+      { name: "Tecno Spark Go 2024", width: 431, height: 966, densityDpi: 320, official: "https://www.gsmarena.com/tecno_spark_go_2024-12704.php" },
+      { name: "Xiaomi Redmi 9A", width: 429, height: 952, densityDpi: 320, official: "https://www.gsmarena.com/xiaomi_redmi_9a-10279.php" },
+      { name: "Samsung Galaxy A03 Core", width: 426, height: 947, densityDpi: 320, official: "https://www.gsmarena.com/samsung_galaxy_a03_core-11275.php" },
+      { name: "Samsung Galaxy A05", width: 440, height: 977, densityDpi: 320, official: "https://www.gsmarena.com/samsung_galaxy_a05-12583.php" },
+      { name: "Samsung Galaxy A15", width: 436, height: 992, densityDpi: 320, official: "https://www.gsmarena.com/samsung_galaxy_a15-12637.php" },
+      { name: "Infinix Smart 5", width: 433, height: 964, densityDpi: 320, official: "https://www.gsmarena.com/infinix_smart_5-10612.php" },
+      { name: "Samsung Galaxy A10s", width: 426, height: 897, densityDpi: 320, official: "https://www.gsmarena.com/samsung_galaxy_a10s-9798.php" },
+      { name: "Tecno Spark 30C", width: 438, height: 974, densityDpi: 320, official: "https://www.gsmarena.com/tecno_spark_30c-13361.php" },
+      { name: "Infinix Hot 40i", width: 429, height: 960, densityDpi: 320, official: "https://www.gsmarena.com/infinix_hot_40i-12733.php" },
+      { name: "ROG Phone 8 Pro", width: 450, height: 1000, densityDpi: 480, official: "https://www.gsmarena.com/asus_rog_phone_8_pro-12729.php" },
+      { name: "Sony Xperia 1 V", width: 450, height: 1000, densityDpi: 640, official: "https://www.gsmarena.com/sony_xperia_1_v-12263.php" },
       
     ];
 
@@ -1524,9 +1525,25 @@
       return [...bySize.values()];
     }
 
+    function inferDensityDpiFromWidth(w) {
+      if (w <= 320) return 240;
+      if (w <= 360) return 420;
+      if (w <= 384) return 420;
+      if (w <= 393) return 440;
+      if (w <= 412) return 560;
+      if (w <= 430) return 560;
+      return 640;
+    }
+
+    /** Android: px = round(dp × densityDpi / 160) */
+    function dpToPx(dp, densityDpi) {
+      return Math.round((dp * densityDpi) / 160);
+    }
+
     const MODELS = dedupeBySizeKeepCommon(RAW_MODELS).map((item) => ({
       ...item,
-      statusBarHeight: item.height >= 930 ? 46 : item.height >= 880 ? 44 : item.height >= 760 ? 42 : 40
+      statusBarHeight: item.height >= 930 ? 46 : item.height >= 880 ? 44 : item.height >= 760 ? 42 : 40,
+      densityDpi: item.densityDpi ?? inferDensityDpiFromWidth(item.width)
     }));
 
     const rangeSlider = document.getElementById("rangeSlider");
@@ -1773,12 +1790,11 @@
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const enforceBottomGap = bottomGapSwitch.checked;
-      const defaultBottomGap = 68;
-      const expandedBottomGap = 80;
-      const minGapToBottomBar = enforceBottomGap ? expandedBottomGap : defaultBottomGap;
+      const editPageBottomGap = 68;
+      const minGapToBottomBar = enforceBottomGap ? editPageBottomGap : 0;
       bottomGapSwitchLabel.textContent = enforceBottomGap
         ? `当前状态：启用 · 保留 ${minGapToBottomBar}dp`
-        : `当前状态：关闭 · 保留 ${minGapToBottomBar}dp`;
+        : "当前状态：关闭 · 不做保留";
       bottomGapRuleText.textContent = `${minGapToBottomBar}dp`;
 
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
@@ -1928,7 +1944,25 @@
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
+      const dDpi = m.densityDpi;
+      const pxPerDp = dDpi / 160;
+      const pxCap = dpToPx(86, dDpi);
+      const pxMusicW = dpToPx(190, dDpi);
+      const pxMusicH = dpToPx(44, dDpi);
+      const pxBack = dpToPx(44, dDpi);
+      const pxBackPad = dpToPx(10, dDpi);
+      const pxBackIcon = dpToPx(24, dDpi);
+      phone.style.setProperty("--density-dpi", String(dDpi));
+      if (captureCircle) {
+        captureCircle.setAttribute("title", `拍摄按钮 86dp ≈ ${pxCap}px（${dDpi}dpi）`);
+      }
+      if (musicEntrance) {
+        musicEntrance.setAttribute("title", `音乐入口 190×44dp ≈ ${pxMusicW}×${pxMusicH}px（${dDpi}dpi）`);
+      }
+      if (cameraBack) {
+        cameraBack.setAttribute("title", `返回 Leading 44×44dp ≈ ${pxBack}×${pxBack}px；图标 24dp ≈ ${pxBackIcon}px（${dDpi}dpi）`);
+      }
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· 预览内布局仍为 dp；物理像素约：拍摄86dp≈${pxCap}px · 音乐条190×44dp≈${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp≈${pxBack}×${pxBack}px（内边距10dp≈${pxBackPad}px · 图标24dp≈${pxBackIcon}px）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
