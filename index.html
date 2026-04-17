@@ -1606,6 +1606,7 @@
         };
       })
       .filter(Boolean);
+    const DEFAULT_MODEL_SIZE = "360x792";
 
     // Top20 common models from provided reference table (size-level dedupe safe).
     const TOP20_COMMON_SIZES = new Set([
@@ -1704,6 +1705,22 @@
         });
         modelTicks.appendChild(el);
       });
+    }
+
+    function setDefaultSelectionBySize(sizeKey) {
+      const targetRangeIndex = RANGE_BUCKETS.findIndex((bucket) =>
+        bucket.models.some((model) => `${model.width}x${model.height}` === sizeKey)
+      );
+      if (targetRangeIndex === -1) return false;
+      rangeSlider.value = String(targetRangeIndex);
+      syncModelSliderByRange();
+      const targetModelIndex = currentModelsInRange.findIndex(
+        (model) => `${model.width}x${model.height}` === sizeKey
+      );
+      if (targetModelIndex !== -1) {
+        modelSlider.value = String(targetModelIndex);
+      }
+      return true;
     }
 
     function gcd(a, b) {
@@ -1966,7 +1983,9 @@
     toolbarFollowFrameSwitch.addEventListener("input", render);
 
     setupRangeTicks();
-    syncModelSliderByRange();
+    if (!setDefaultSelectionBySize(DEFAULT_MODEL_SIZE)) {
+      syncModelSliderByRange();
+    }
     render();
   </script>
 </body>
