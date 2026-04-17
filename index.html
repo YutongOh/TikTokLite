@@ -1549,6 +1549,32 @@
       densityDpi: item.densityDpi ?? inferDensityDpiFromWidth(item.width)
     }));
 
+    /** 设备画布 px：逻辑 dp × (densityDpi/160)，与 Android 一致 */
+    function phoneCanvasPx(model) {
+      const d = model.densityDpi / 160;
+      return {
+        w: Math.round(model.width * d),
+        h: Math.round(model.height * d)
+      };
+    }
+
+    const PREVIEW_STAGE_W = 360;
+    const PREVIEW_STAGE_H = 800;
+    let PREVIEW_MAX_CANVAS_W_PX = 0;
+    let PREVIEW_MAX_CANVAS_H_PX = 0;
+    MODELS.forEach((model) => {
+      const { w, h } = phoneCanvasPx(model);
+      if (w > PREVIEW_MAX_CANVAS_W_PX) PREVIEW_MAX_CANVAS_W_PX = w;
+      if (h > PREVIEW_MAX_CANVAS_H_PX) PREVIEW_MAX_CANVAS_H_PX = h;
+    });
+    PREVIEW_MAX_CANVAS_W_PX = Math.max(1, PREVIEW_MAX_CANVAS_W_PX);
+    PREVIEW_MAX_CANVAS_H_PX = Math.max(1, PREVIEW_MAX_CANVAS_H_PX);
+    /** 全机型共用：按机型库中最大 px 画布适配预览壳，保证任意机型完整落在容器内；小机型在预览中视觉更小 */
+    const PREVIEW_SCALE_GLOBAL = Math.min(
+      PREVIEW_STAGE_W / PREVIEW_MAX_CANVAS_W_PX,
+      PREVIEW_STAGE_H / PREVIEW_MAX_CANVAS_H_PX
+    );
+
     const rangeSlider = document.getElementById("rangeSlider");
     const modelSlider = document.getElementById("modelSlider");
     const rangeTicks = document.getElementById("rangeTicks");
@@ -1790,11 +1816,6 @@
       const phoneW_px = Math.round(m.width * pxPerDp);
       const phoneH_px = Math.round(m.height * pxPerDp);
 
-      const stageWidth = 360;
-      const stageHeight = 800;
-      /** 统一等比缩放，使任意机型画布在 360×800 容器内完整可见（与逻辑 dp 等比时等价于 min(360/w,800/h)） */
-      const scaleFit = Math.min(stageWidth / phoneW_px, stageHeight / phoneH_px);
-
       const bottomBarHeightDp = 24;
       const enforceBottomGap = bottomGapSwitch.checked;
       const editPageBottomGapDp = 68;
@@ -1860,7 +1881,7 @@
       phone.style.left = "50%";
       phone.style.top = "50%";
       phone.style.margin = "";
-      phone.style.transform = `translate(-50%, -50%) scale(${scaleFit})`;
+      phone.style.transform = `translate(-50%, -50%) scale(${PREVIEW_SCALE_GLOBAL})`;
 
       statusBar.style.height = `${dpx(m.statusBarHeight)}px`;
       statusBar.style.background = frameTopOn
@@ -1990,8 +2011,13 @@
       if (cameraBack) {
         cameraBack.setAttribute("title", `返回 Leading 44×44dp ≈ ${pxBack}×${pxBack}px；图标 24dp ≈ ${pxBackIcon}px（${dDpi}dpi）`);
       }
-      const previewModeDesc = `预览等比缩放≈${scaleFit.toFixed(4)}（画布 ${phoneW_px}×${phoneH_px} 设备 px → 适配 360×800 容器）`;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTopDp}dp${frameTopOffsetDp ? `（含下移 ${frameTopOffsetDp}dp）` : ""} · 系统底部指示条：${bottomBarHeightDp}dp · 距底部系统条：${bottomGapDp}dp（最低 ${minGapToBottomBarDp}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· ${previewModeDesc} · 控件物理像素：拍摄86dp=${pxCap}px · 音乐190×44dp=${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp=${pxBack}×${pxBack}px（内边距10dp=${pxBackPad}px · 图标24dp=${pxBackIcon}px）`;
+      const previewVisW = Math.round(phoneW_px * PREVIEW_SCALE_GLOBAL);
+      const previewVisH = Math.round(phoneH_px * PREVIEW_SCALE_GLOBAL);
+      const previewModeDesc =
+        `界面坐标系：设备 px（画布 ${phoneW_px}×${phoneH_px}px）；` +
+        `全机型固定预览缩放 ${PREVIEW_SCALE_GLOBAL.toFixed(5)}（按库内最大画布 ${PREVIEW_MAX_CANVAS_W_PX}×${PREVIEW_MAX_CANVAS_H_PX}px 适配 ${PREVIEW_STAGE_W}×${PREVIEW_STAGE_H}）；` +
+        `本机在预览中视觉尺寸约 ${previewVisW}×${previewVisH}px`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTopDp}dp${frameTopOffsetDp ? `（含下移 ${frameTopOffsetDp}dp）` : ""} · 系统底部指示条：${bottomBarHeightDp}dp · 距底部系统条：${bottomGapDp}dp（最低 ${minGapToBottomBarDp}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· ${previewModeDesc} · 控件在真机上的物理像素：拍摄86dp=${pxCap}px · 音乐190×44dp=${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp=${pxBack}×${pxBack}px（内边距10dp=${pxBackPad}px · 图标24dp=${pxBackIcon}px）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
