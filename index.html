@@ -290,7 +290,8 @@
       height: 100%;
       object-fit: cover;
       z-index: 1;
-      background: #111;
+      /* 无视频帧时透出下方 .camera-rect 渐变，避免整片死黑 */
+      background: transparent;
     }
 
     .camera-rect::after {
@@ -1273,6 +1274,11 @@
                 playsinline
                 preload="auto"
               >
+                <!-- 线上无 ./assets/test-video.mp4 时原路径 404 会黑屏；主源用可直连的 HTTPS 样片 -->
+                <source
+                  src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+                  type="video/mp4"
+                />
                 <source src="./assets/test-video.mp4" type="video/mp4" />
               </video>
             </div>
@@ -1624,6 +1630,14 @@
     const modelSpec = document.getElementById("modelSpec");
     const modelLinkWrap = document.getElementById("modelLinkWrap");
 
+    /** 预览区：样片加载后补一次 play（部分浏览器对 autoplay 仍可能不播） */
+    if (cameraVideo) {
+      cameraVideo.addEventListener("loadeddata", () => {
+        const p = cameraVideo.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      });
+    }
+
     const RANGE_DEFS = [
       { key: "small", label: "小屏", helper: "h ≤ 640", match: (m) => m.height <= 640 },
       { key: "standard", label: "标准屏", helper: "641-800", match: (m) => m.height >= 641 && m.height <= 800 },
@@ -1923,7 +1937,7 @@
       statusBar.style.height = `${dpx(m.statusBarHeight)}px`;
       statusBar.style.background = frameTopOn
         ? "transparent"
-        : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))`;
+        : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
       bottomBar.style.height = `${dpx(bottomBarHeightDp)}px`;
       const pillW = Math.round(phoneW_px * (108 / 360));
       const pillH = Math.max(2, dpx(4));
