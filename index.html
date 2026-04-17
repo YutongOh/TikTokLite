@@ -90,6 +90,37 @@
       width: 360px;
       height: 800px;
     }
+    .phone-shell.is-pixel-1-1 {
+      width: 100%;
+      max-width: min(100%, 96vw);
+      height: auto;
+      min-height: 360px;
+      max-height: min(88vh, 1400px);
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .pixel-preview-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      user-select: none;
+    }
+    .pixel-preview-toggle input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
 
     .status-bar {
       position: absolute;
@@ -99,8 +130,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 16px;
-      font-size: 14px;
+      padding: 0 var(--sb-pad, 16px);
+      font-size: var(--status-font, 14px);
       letter-spacing: 0.25px;
       color: #fff;
       background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25));
@@ -120,8 +151,8 @@
       display: block;
     }
     .status-icon-box {
-      width: 16px;
-      height: 16px;
+      width: var(--status-icon-size, 16px);
+      height: var(--status-icon-size, 16px);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -142,18 +173,18 @@
       box-sizing: border-box;
     }
     .camera-back-variant[data-variant="Icon"] {
-      padding: 10px;
+      padding: var(--back-pad, 10px);
       display: flex;
       justify-content: flex-start;
       align-items: flex-start;
       box-sizing: border-box;
-      width: 44px;
-      height: 44px;
-      flex: 0 0 44px;
+      width: 100%;
+      height: 100%;
+      flex: 0 0 auto;
     }
     .camera-back-icon-slot {
-      width: 24px;
-      height: 24px;
+      width: var(--back-icon, 24px);
+      height: var(--back-icon, 24px);
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
@@ -169,7 +200,7 @@
     .sound-entrance {
       position: absolute;
       left: 50%;
-      max-width: 190px;
+      max-width: none;
       width: 190px;
       height: 44px;
       transform: translate(-50%, -50%);
@@ -404,8 +435,8 @@
     }
     .bottom-bar::before {
       content: "";
-      width: 108px;
-      height: 4px;
+      width: var(--pill-w, 108px);
+      height: var(--pill-h, 4px);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.95);
     }
@@ -1227,6 +1258,10 @@
   <main class="layout">
     <section class="card preview">
       <div class="phone-wrap">
+        <label class="pixel-preview-toggle">
+          <input id="pixelOneToOneSwitch" type="checkbox" />
+          1:1 设备像素（可滚动，感受不同 dpi 下真实占位）
+        </label>
         <div id="phoneShell" class="phone-shell">
           <div id="phone" class="phone">
             <div id="statusBar" class="status-bar">
@@ -1552,6 +1587,7 @@
     const modelTicks = document.getElementById("modelTicks");
     const modelCurrent = document.getElementById("modelCurrent");
     const phoneShell = document.getElementById("phoneShell");
+    const pixelOneToOneSwitch = document.getElementById("pixelOneToOneSwitch");
     const phone = document.getElementById("phone");
     const statusBar = document.getElementById("statusBar");
     const musicEntrance = document.getElementById("musicEntrance");
@@ -1644,8 +1680,9 @@
      * Music bar: X = phone logical center; Y = visual center of Flip icon-wrap (accounts for toolbar scale).
      * Double rAF reads layout after transforms composite; generation token drops stale callbacks.
      */
-    function scheduleMusicEntranceAlign(layoutModel, layoutUiScale) {
+    function scheduleMusicEntranceAlign(layoutModel, layoutUiScale, extras = {}) {
       const gen = (musicEntranceAlignGen += 1);
+      const backLeftPx = extras.backLeftPx ?? 6;
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (gen !== musicEntranceAlignGen) return;
@@ -1654,16 +1691,21 @@
           const pr = phone.getBoundingClientRect();
           const ir = flipWrap.getBoundingClientRect();
           if (pr.width < 1 || pr.height < 1) return;
-          const sy = layoutModel.height / pr.height;
+          const hPx = layoutModel.heightPx != null ? layoutModel.heightPx : layoutModel.height;
+          const sy = hPx / pr.height;
           const iconCy = (ir.top + ir.height * 0.5 - pr.top) * sy;
-          const pageCx = layoutModel.width * 0.5;
+          const pageCx = layoutModel.widthPx != null ? layoutModel.widthPx * 0.5 : layoutModel.width * 0.5;
           musicEntrance.style.left = `${pageCx}px`;
           musicEntrance.style.top = `${iconCy}px`;
-          musicEntrance.style.transform = `translate(-50%, -50%) scale(${layoutUiScale})`;
+          musicEntrance.style.transform =
+            layoutUiScale !== 1
+              ? `translate(-50%, -50%) scale(${layoutUiScale})`
+              : "translate(-50%, -50%)";
           if (cameraBack) {
-            cameraBack.style.left = "6px";
+            cameraBack.style.left = `${backLeftPx}px`;
             cameraBack.style.top = `${iconCy}px`;
-            cameraBack.style.transform = `translateY(-50%) scale(${layoutUiScale})`;
+            cameraBack.style.transform =
+              layoutUiScale !== 1 ? `translateY(-50%) scale(${layoutUiScale})` : "translateY(-50%)";
           }
         });
       });
@@ -1776,37 +1818,37 @@
       /** V2 第二个开关：可单独开启；开启后禁用「画幅展示规则」并按专属逻辑自动选 cover-height / cover-width */
       const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
 
+      const dDpi = m.densityDpi;
+      const pxPerDp = dDpi / 160;
+      const dpx = (dp) => Math.round(dp * pxPerDp);
+      const phoneW_px = Math.round(m.width * pxPerDp);
+      const phoneH_px = Math.round(m.height * pxPerDp);
+
       const stageWidth = 360;
       const stageHeight = 800;
-      const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
-      phone.style.width = `${m.width}px`;
-      phone.style.height = `${m.height}px`;
-      phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      const pixelOneToOne = pixelOneToOneSwitch && pixelOneToOneSwitch.checked;
+      phoneShell.classList.toggle("is-pixel-1-1", pixelOneToOne);
+      const scaleFit = Math.min(stageWidth / phoneW_px, stageHeight / phoneH_px);
 
-      statusBar.style.height = `${m.statusBarHeight}px`;
-      statusBar.style.background = frameTopOn
-        ? "transparent"
-        : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      const bottomBarHeight = 24;
-      bottomBar.style.height = `${bottomBarHeight}px`;
+      const bottomBarHeightDp = 24;
       const enforceBottomGap = bottomGapSwitch.checked;
-      const editPageBottomGap = 68;
-      const minGapToBottomBar = enforceBottomGap ? editPageBottomGap : 0;
+      const editPageBottomGapDp = 68;
+      const minGapToBottomBarDp = enforceBottomGap ? editPageBottomGapDp : 0;
       bottomGapSwitchLabel.textContent = enforceBottomGap
-        ? `当前状态：启用 · 保留 ${minGapToBottomBar}dp`
+        ? `当前状态：启用 · 保留 ${minGapToBottomBarDp}dp`
         : "当前状态：关闭 · 不做保留";
-      bottomGapRuleText.textContent = `${minGapToBottomBar}dp`;
+      bottomGapRuleText.textContent = `${minGapToBottomBarDp}dp`;
 
-      const topBase = frameTopOn ? 0 : m.statusBarHeight;
-      const bottomBarTop = m.height - bottomBarHeight;
-      let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
+      const topBaseDp = frameTopOn ? 0 : m.statusBarHeight;
+      const bottomBarTopDp = m.height - bottomBarHeightDp;
+      let availableHeightDp = bottomBarTopDp - minGapToBottomBarDp - topBaseDp;
       frameFitOptions.classList.toggle("is-disabled", v2ExclusiveFrameFitOn);
       frameFitModeInputs.forEach((input) => {
         input.disabled = v2ExclusiveFrameFitOn;
       });
       let frameFitMode = selectedFrameFitMode;
       if (v2ExclusiveFrameFitOn) {
-        const fullHeightFrameW = Math.round(availableHeight * 9 / 16);
+        const fullHeightFrameW = Math.round(availableHeightDp * 9 / 16);
         frameFitMode = fullHeightFrameW < m.width ? "cover-width" : "cover-height";
       }
       const frameFitStatusPrefix = v2ExclusiveFrameFitOn ? "当前状态：V2 专属 · " : "当前状态：";
@@ -1818,24 +1860,65 @@
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
       if (frameFitMode === "contain") {
-        if (rectH > availableHeight) {
-          rectH = availableHeight;
+        if (rectH > availableHeightDp) {
+          rectH = availableHeightDp;
           rectW = Math.floor(rectH * 9 / 16);
         }
       } else if (frameFitMode === "cover-width") {
         const fullWidthFrameH = Math.round(m.width * 16 / 9);
         rectW = m.width;
-        rectH = Math.min(fullWidthFrameH, availableHeight);
+        rectH = Math.min(fullWidthFrameH, availableHeightDp);
       } else {
-        rectH = availableHeight;
+        rectH = availableHeightDp;
         rectW = Math.round(rectH * 9 / 16);
       }
-      let frameScale = rectW / 360;
 
       const frameStyleOn = frameStyleSwitch.checked;
-      const frameTopOffset = frameStyleOn ? Math.max(0, Math.round((availableHeight - rectH) / 2)) : 0;
-      const frameTop = topBase + frameTopOffset;
-      const frameRadiusPx = frameStyleOn ? 20 : 0;
+      const frameTopOffsetDp = frameStyleOn ? Math.max(0, Math.round((availableHeightDp - rectH) / 2)) : 0;
+      const frameTopDp = topBaseDp + frameTopOffsetDp;
+      const frameTop_px = Math.round(frameTopDp * pxPerDp);
+      const rectW_px = Math.round(rectW * pxPerDp);
+      const rectH_px = Math.round(rectH * pxPerDp);
+      const rectX_px = Math.floor(((m.width - rectW) * pxPerDp) / 2);
+      const frameRadiusPx = frameStyleOn ? dpx(20) : 0;
+
+      phone.style.width = `${phoneW_px}px`;
+      phone.style.height = `${phoneH_px}px`;
+      phone.style.setProperty("--density-dpi", String(dDpi));
+      phone.style.setProperty("--sb-pad", `${dpx(16)}px`);
+      phone.style.setProperty("--status-font", `${dpx(14)}px`);
+      phone.style.setProperty("--status-icon-size", `${dpx(16)}px`);
+      phone.style.setProperty("--back-pad", `${dpx(10)}px`);
+      phone.style.setProperty("--back-icon", `${dpx(24)}px`);
+
+      if (pixelOneToOne) {
+        phone.style.position = "relative";
+        phone.style.left = "auto";
+        phone.style.top = "auto";
+        phone.style.margin = "0 auto";
+        phone.style.transform = "none";
+      } else {
+        phone.style.position = "absolute";
+        phone.style.left = "50%";
+        phone.style.top = "50%";
+        phone.style.margin = "";
+        phone.style.transform = `translate(-50%, -50%) scale(${scaleFit})`;
+      }
+
+      statusBar.style.height = `${dpx(m.statusBarHeight)}px`;
+      statusBar.style.background = frameTopOn
+        ? "transparent"
+        : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))`;
+      bottomBar.style.height = `${dpx(bottomBarHeightDp)}px`;
+      const pillW = Math.round(phoneW_px * (108 / 360));
+      const pillH = Math.max(2, dpx(4));
+      bottomBar.style.setProperty("--pill-w", `${pillW}px`);
+      bottomBar.style.setProperty("--pill-h", `${pillH}px`);
+
+      cameraRect.style.left = `${rectX_px}px`;
+      cameraRect.style.top = `${frameTop_px}px`;
+      cameraRect.style.width = `${rectW_px}px`;
+      cameraRect.style.height = `${rectH_px}px`;
       cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
       frameStyleSwitchLabel.textContent = frameStyleOn
         ? "当前状态：开启 · 圆角 20dp · 画幅居中"
@@ -1845,61 +1928,51 @@
         ? "当前状态：开启 · 距画幅顶端 16dp"
         : "当前状态：关闭 · 距顶部 bar 16dp";
 
-      const rectX = Math.floor((m.width - rectW) / 2);
-      cameraRect.style.left = `${rectX}px`;
-      cameraRect.style.top = `${frameTop}px`;
-      cameraRect.style.width = `${rectW}px`;
-      cameraRect.style.height = `${rectH}px`;
-      const fixedModeCompensationScale = 1 / scale;
-      const layoutScale = fixedModeCompensationScale;
-      // Right toolbar scales from 56x354 at 360x800 baseline.
-      const uiScale = fixedModeCompensationScale;
-      const toolbarTop = toolbarFollowFrameOn
-        ? Math.round(frameTop + 16 * uiScale)
-        : Math.round(m.statusBarHeight + 16 * uiScale);
-      rightTools.style.top = `${toolbarTop}px`;
+      const toolbarTop_px = toolbarFollowFrameOn
+        ? Math.round(frameTop_px + dpx(16))
+        : Math.round(dpx(m.statusBarHeight) + dpx(16));
+      rightTools.style.top = `${toolbarTop_px}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
-      rightTools.style.transform = `scale(${uiScale})`;
-      // Music: X = logical screen center; Y = Flip icon-wrap center (toolbar scale + origin: post-layout measure).
-      const iconCyAnalytic = toolbarTop + 18 * uiScale;
-      musicEntrance.style.left = `${m.width * 0.5}px`;
+      rightTools.style.transform = `scale(${pxPerDp})`;
+      rightTools.style.transformOrigin = "top right";
+
+      const iconCyAnalytic = toolbarTop_px + 18 * pxPerDp;
+      const backLeftPx = dpx(6);
+      musicEntrance.style.left = `${phoneW_px * 0.5}px`;
       musicEntrance.style.top = `${iconCyAnalytic}px`;
-      musicEntrance.style.transform = `translate(-50%, -50%) scale(${uiScale})`;
+      musicEntrance.style.transform = "translate(-50%, -50%)";
+      musicEntrance.style.width = `${dpx(190)}px`;
+      musicEntrance.style.height = `${dpx(44)}px`;
       if (cameraBack) {
-        cameraBack.style.left = "6px";
+        cameraBack.style.left = `${backLeftPx}px`;
         cameraBack.style.top = `${iconCyAnalytic}px`;
-        cameraBack.style.transform = `translateY(-50%) scale(${uiScale})`;
+        cameraBack.style.transform = "translateY(-50%)";
+        cameraBack.style.width = `${dpx(44)}px`;
+        cameraBack.style.height = `${dpx(44)}px`;
       }
-      scheduleMusicEntranceAlign(m, uiScale);
-      let circleSize;
-      let captureScale;
-      captureScale = fixedModeCompensationScale;
-      circleSize = 86 / scale;
-      const captureSvgBottomPad = 0;
-      const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
-      const hasBottomBlackBar = bottomGap > 0;
-      // 拍摄按钮距离规则：
-      // 统一按实际是否存在底部黑边判断：
-      // 1. 有底部黑边时，容器底边距系统 bar 顶部 89dp
-      // 2. 无底部黑边时，容器底边距系统 bar 顶部 40dp
+      scheduleMusicEntranceAlign({ ...m, widthPx: phoneW_px, heightPx: phoneH_px }, 1, { backLeftPx });
+
+      const bottomGapDp = Math.max(0, bottomBarTopDp - (frameTopDp + rectH));
+      const hasBottomBlackBar = bottomGapDp > 0;
       const captureBottomToSystemBarTopDp = hasBottomBlackBar ? 89 : 40;
-      const circleBottomInset = bottomBarHeight + captureBottomToSystemBarTopDp;
+      const circleBottomInset_px = dpx(bottomBarHeightDp + captureBottomToSystemBarTopDp);
+      const circleSize = dpx(86);
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
-      captureCircle.style.bottom = `${circleBottomInset}px`;
-      const tabScale = fixedModeCompensationScale;
-      const tabGap = Math.max(8, 16 * tabScale);
-      const tabFontSize = Math.max(9, 14 * tabScale);
-      const tabLineHeight = Math.max(11, 18 * tabScale);
-      const tabLetterSpacing = 0.6652911901473999 * tabScale;
-      const tabPillWidth = Math.max(24, 38 * tabScale);
-      const tabPillHeight = Math.max(16, 26 * tabScale);
-      const tabPillRadius = Math.max(12, 20 * tabScale);
-      const tab3mWidth = Math.max(14, 22 * tabScale);
-      const tab60sWidth = Math.max(16, 26 * tabScale);
-      const tabPhotoWidth = Math.max(24, 40 * tabScale);
-      const tabBottomToButton = Math.round(16 * layoutScale);
+      captureCircle.style.bottom = `${circleBottomInset_px}px`;
+
+      const tabGap = Math.max(8, dpx(16));
+      const tabFontSize = Math.max(9, dpx(14));
+      const tabLineHeight = Math.max(11, dpx(18));
+      const tabLetterSpacing = 0.6652911901473999 * pxPerDp;
+      const tabPillWidth = Math.max(24, dpx(38));
+      const tabPillHeight = Math.max(16, dpx(26));
+      const tabPillRadius = Math.max(12, dpx(20));
+      const tab3mWidth = Math.max(14, dpx(22));
+      const tab60sWidth = Math.max(16, dpx(26));
+      const tabPhotoWidth = Math.max(24, dpx(40));
+      const tabBottomToButton = dpx(16);
       shootTab.style.setProperty("--shoot-tab-gap", `${tabGap}px`);
       shootTab.style.setProperty("--shoot-tab-font-size", `${tabFontSize}px`);
       shootTab.style.setProperty("--shoot-tab-line-height", `${tabLineHeight}px`);
@@ -1910,25 +1983,26 @@
       shootTab.style.setProperty("--shoot-tab-item-3m-width", `${tab3mWidth}px`);
       shootTab.style.setProperty("--shoot-tab-item-60s-width", `${tab60sWidth}px`);
       shootTab.style.setProperty("--shoot-tab-item-photo-width", `${tabPhotoWidth}px`);
-      shootTab.style.bottom = `${circleBottomInset + circleSize + tabBottomToButton}px`;
+      shootTab.style.bottom = `${circleBottomInset_px + circleSize + tabBottomToButton}px`;
       const pillCenterX = shootTabCenter.offsetLeft + shootTabCenter.offsetWidth / 2;
       shootTab.style.transform = `translateX(${-pillCenterX}px)`;
-      const sideGap = Math.max(0, rectX);
+      const sideGapDp = Math.max(0, Math.floor((m.width - rectW) / 2));
+      const sideGapPx = rectX_px;
       const isCommonModel = TOP20_COMMON_SIZES.has(`${m.width}x${m.height}`);
       modelTicks.classList.toggle("common-selected", isCommonModel);
 
-      if (sideGap > 0) {
+      if (sideGapDp > 0) {
         gapLeftTag.hidden = false;
         gapRightTag.hidden = false;
-        gapLeftTag.textContent = `左间距 ${sideGap}dp`;
-        gapRightTag.textContent = `右间距 ${sideGap}dp`;
+        gapLeftTag.textContent = `左间距 ${sideGapDp}dp · ${sideGapPx}px`;
+        gapRightTag.textContent = `右间距 ${sideGapDp}dp · ${sideGapPx}px`;
       } else {
         gapLeftTag.hidden = true;
         gapRightTag.hidden = true;
       }
-      if (bottomGap > 0) {
+      if (bottomGapDp > 0) {
         gapBottomTag.hidden = false;
-        gapBottomTag.textContent = `距底部Bar ${bottomGap}dp`;
+        gapBottomTag.textContent = `距底部Bar ${bottomGapDp}dp（≈${dpx(bottomGapDp)}px）`;
       } else {
         gapBottomTag.hidden = true;
       }
@@ -1936,23 +2010,20 @@
       const ratio = `≈ ${approximateRatio(m.width, m.height)}`;
       totalModelsText.textContent = `${MODELS.length}`;
       rangeText.textContent = `${bucket.label} (${bucket.helper}) · ${bucket.minW}×${bucket.minH} ~ ${bucket.maxW}×${bucket.maxH}（${bucket.models.length}台）`;
-      sizeText.textContent = `${m.width}×${m.height} dp`;
+      sizeText.textContent = `${phoneW_px}×${phoneH_px} px（${m.width}×${m.height} dp）`;
       ratioText.textContent = ratio;
-      rectSizeText.textContent = `${rectW}×${rectH} dp`;
-      sideGapText.textContent = sideGap > 0 ? `${sideGap}dp` : "无";
-      bottomGapText.textContent = `${bottomGap}dp`;
-      modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
+      rectSizeText.textContent = `${rectW_px}×${rectH_px} px（${rectW}×${rectH} dp）`;
+      sideGapText.textContent = sideGapDp > 0 ? `${sideGapDp}dp / ${sideGapPx}px` : "无";
+      bottomGapText.textContent = `${bottomGapDp}dp（≈${dpx(bottomGapDp)}px）`;
+      modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height} dp · ${phoneW_px}×${phoneH_px} px`;
 
       modelTitle.textContent = m.name;
-      const dDpi = m.densityDpi;
-      const pxPerDp = dDpi / 160;
       const pxCap = dpToPx(86, dDpi);
       const pxMusicW = dpToPx(190, dDpi);
       const pxMusicH = dpToPx(44, dDpi);
       const pxBack = dpToPx(44, dDpi);
       const pxBackPad = dpToPx(10, dDpi);
       const pxBackIcon = dpToPx(24, dDpi);
-      phone.style.setProperty("--density-dpi", String(dDpi));
       if (captureCircle) {
         captureCircle.setAttribute("title", `拍摄按钮 86dp ≈ ${pxCap}px（${dDpi}dpi）`);
       }
@@ -1962,7 +2033,10 @@
       if (cameraBack) {
         cameraBack.setAttribute("title", `返回 Leading 44×44dp ≈ ${pxBack}×${pxBack}px；图标 24dp ≈ ${pxBackIcon}px（${dDpi}dpi）`);
       }
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· 预览内布局仍为 dp；物理像素约：拍摄86dp≈${pxCap}px · 音乐条190×44dp≈${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp≈${pxBack}×${pxBack}px（内边距10dp≈${pxBackPad}px · 图标24dp≈${pxBackIcon}px）`;
+      const previewModeDesc = pixelOneToOne
+        ? "预览：1:1 设备像素（可滚动）"
+        : `预览：缩放≈${scaleFit.toFixed(4)} 以适配 360×800 面板（坐标系仍为设备 px）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTopDp}dp${frameTopOffsetDp ? `（含下移 ${frameTopOffsetDp}dp）` : ""} · 系统底部指示条：${bottomBarHeightDp}dp · 距底部系统条：${bottomGapDp}dp（最低 ${minGapToBottomBarDp}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· ${previewModeDesc} · 画布 ${phoneW_px}×${phoneH_px}px · 控件物理像素：拍摄86dp=${pxCap}px · 音乐190×44dp=${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp=${pxBack}×${pxBack}px（内边距10dp=${pxBackPad}px · 图标24dp=${pxBackIcon}px）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
@@ -1996,6 +2070,7 @@
     bottomGapSwitch.addEventListener("input", render);
     frameStyleSwitch.addEventListener("input", render);
     toolbarFollowFrameSwitch.addEventListener("input", render);
+    pixelOneToOneSwitch.addEventListener("change", render);
 
     setupRangeTicks();
     syncModelSliderByRange();
