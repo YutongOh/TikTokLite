@@ -1656,6 +1656,14 @@
       })
       .filter(Boolean);
 
+    /** 防止 range 滑块越界导致 RANGE_BUCKETS[i] 为 undefined、整段脚本抛错 */
+    function clampRangeIndex(raw) {
+      const n = Number(raw);
+      const idx = Number.isFinite(n) ? Math.trunc(n) : 0;
+      if (!RANGE_BUCKETS.length) return 0;
+      return Math.min(Math.max(0, idx), RANGE_BUCKETS.length - 1);
+    }
+
     // Top20 common models from provided reference table (size-level dedupe safe).
     const TOP20_COMMON_SIZES = new Set([
       "431x966",
@@ -1709,9 +1717,13 @@
     }
 
     rangeSlider.min = "0";
-    rangeSlider.max = String(RANGE_BUCKETS.length - 1);
+    rangeSlider.max = String(Math.max(0, RANGE_BUCKETS.length - 1));
     rangeSlider.step = "1";
-    rangeSlider.value = "1";
+    {
+      const maxIdx = Math.max(0, RANGE_BUCKETS.length - 1);
+      const preferStandard = Math.min(1, maxIdx);
+      rangeSlider.value = String(RANGE_BUCKETS.length <= 1 ? 0 : preferStandard);
+    }
 
     function setupRangeTicks() {
       rangeTicks.innerHTML = "";
@@ -1734,11 +1746,16 @@
     }
 
     function syncModelSliderByRange() {
-      const rangeIndex = Number(rangeSlider.value);
+      if (!RANGE_BUCKETS.length) {
+        currentModelsInRange = [];
+        return;
+      }
+      const rangeIndex = clampRangeIndex(rangeSlider.value);
+      rangeSlider.value = String(rangeIndex);
       currentModelsInRange = RANGE_BUCKETS[rangeIndex].models;
 
       modelSlider.min = "0";
-      modelSlider.max = String(currentModelsInRange.length - 1);
+      modelSlider.max = String(Math.max(0, currentModelsInRange.length - 1));
       modelSlider.step = "1";
       modelSlider.value = "0";
 
@@ -1794,11 +1811,24 @@
     }
 
     function render() {
-      const rangeIndex = Number(rangeSlider.value);
-      const modelIndex = Number(modelSlider.value);
+      if (!RANGE_BUCKETS.length) return;
+      const clampedRange = clampRangeIndex(rangeSlider.value);
+      if (String(rangeSlider.value) !== String(clampedRange)) {
+        rangeSlider.value = String(clampedRange);
+        syncModelSliderByRange();
+      }
+      const rangeIndex = clampRangeIndex(rangeSlider.value);
       const bucket = RANGE_BUCKETS[rangeIndex];
       if (!bucket || !currentModelsInRange.length) return;
-      const m = currentModelsInRange[Math.min(modelIndex, currentModelsInRange.length - 1)];
+
+      let modelIndex = Number(modelSlider.value);
+      if (!Number.isFinite(modelIndex)) modelIndex = 0;
+      modelIndex = Math.min(Math.max(0, Math.trunc(modelIndex)), Math.max(0, currentModelsInRange.length - 1));
+      if (String(modelSlider.value) !== String(modelIndex)) {
+        modelSlider.value = String(modelIndex);
+      }
+
+      const m = currentModelsInRange[modelIndex];
       if (!m) return;
       const selectionKey = `${rangeIndex}-${modelIndex}`;
       const rangeMin = Number(rangeSlider.min || 0);
