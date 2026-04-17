@@ -89,37 +89,9 @@
       display: inline-block;
       width: 360px;
       height: 800px;
-    }
-    .phone-shell.is-pixel-1-1 {
-      width: 100%;
-      max-width: min(100%, 96vw);
-      height: auto;
-      min-height: 360px;
-      max-height: min(88vh, 1400px);
-      overflow: auto;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .pixel-preview-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      margin: 0 0 10px;
-      font-size: 13px;
-      color: var(--on-surface-variant);
-      cursor: pointer;
-      user-select: none;
-    }
-    .pixel-preview-toggle input {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--primary);
+      overflow: hidden;
+      flex-shrink: 0;
+      border-radius: 24px;
     }
 
     .status-bar {
@@ -1258,10 +1230,6 @@
   <main class="layout">
     <section class="card preview">
       <div class="phone-wrap">
-        <label class="pixel-preview-toggle">
-          <input id="pixelOneToOneSwitch" type="checkbox" />
-          1:1 设备像素（可滚动，感受不同 dpi 下真实占位）
-        </label>
         <div id="phoneShell" class="phone-shell">
           <div id="phone" class="phone">
             <div id="statusBar" class="status-bar">
@@ -1586,8 +1554,6 @@
     const rangeTicks = document.getElementById("rangeTicks");
     const modelTicks = document.getElementById("modelTicks");
     const modelCurrent = document.getElementById("modelCurrent");
-    const phoneShell = document.getElementById("phoneShell");
-    const pixelOneToOneSwitch = document.getElementById("pixelOneToOneSwitch");
     const phone = document.getElementById("phone");
     const statusBar = document.getElementById("statusBar");
     const musicEntrance = document.getElementById("musicEntrance");
@@ -1826,8 +1792,7 @@
 
       const stageWidth = 360;
       const stageHeight = 800;
-      const pixelOneToOne = pixelOneToOneSwitch && pixelOneToOneSwitch.checked;
-      phoneShell.classList.toggle("is-pixel-1-1", pixelOneToOne);
+      /** 统一等比缩放，使任意机型画布在 360×800 容器内完整可见（与逻辑 dp 等比时等价于 min(360/w,800/h)） */
       const scaleFit = Math.min(stageWidth / phoneW_px, stageHeight / phoneH_px);
 
       const bottomBarHeightDp = 24;
@@ -1891,19 +1856,11 @@
       phone.style.setProperty("--back-pad", `${dpx(10)}px`);
       phone.style.setProperty("--back-icon", `${dpx(24)}px`);
 
-      if (pixelOneToOne) {
-        phone.style.position = "relative";
-        phone.style.left = "auto";
-        phone.style.top = "auto";
-        phone.style.margin = "0 auto";
-        phone.style.transform = "none";
-      } else {
-        phone.style.position = "absolute";
-        phone.style.left = "50%";
-        phone.style.top = "50%";
-        phone.style.margin = "";
-        phone.style.transform = `translate(-50%, -50%) scale(${scaleFit})`;
-      }
+      phone.style.position = "absolute";
+      phone.style.left = "50%";
+      phone.style.top = "50%";
+      phone.style.margin = "";
+      phone.style.transform = `translate(-50%, -50%) scale(${scaleFit})`;
 
       statusBar.style.height = `${dpx(m.statusBarHeight)}px`;
       statusBar.style.background = frameTopOn
@@ -2033,10 +1990,8 @@
       if (cameraBack) {
         cameraBack.setAttribute("title", `返回 Leading 44×44dp ≈ ${pxBack}×${pxBack}px；图标 24dp ≈ ${pxBackIcon}px（${dDpi}dpi）`);
       }
-      const previewModeDesc = pixelOneToOne
-        ? "预览：1:1 设备像素（可滚动）"
-        : `预览：缩放≈${scaleFit.toFixed(4)} 以适配 360×800 面板（坐标系仍为设备 px）`;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTopDp}dp${frameTopOffsetDp ? `（含下移 ${frameTopOffsetDp}dp）` : ""} · 系统底部指示条：${bottomBarHeightDp}dp · 距底部系统条：${bottomGapDp}dp（最低 ${minGapToBottomBarDp}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· ${previewModeDesc} · 画布 ${phoneW_px}×${phoneH_px}px · 控件物理像素：拍摄86dp=${pxCap}px · 音乐190×44dp=${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp=${pxBack}×${pxBack}px（内边距10dp=${pxBackPad}px · 图标24dp=${pxBackIcon}px）`;
+      const previewModeDesc = `预览等比缩放≈${scaleFit.toFixed(4)}（画布 ${phoneW_px}×${phoneH_px} 设备 px → 适配 360×800 容器）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTopDp}dp${frameTopOffsetDp ? `（含下移 ${frameTopOffsetDp}dp）` : ""} · 系统底部指示条：${bottomBarHeightDp}dp · 距底部系统条：${bottomGapDp}dp（最低 ${minGapToBottomBarDp}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}） · 密度≈${dDpi}dpi（1dp≈${pxPerDp.toFixed(3)}px）· ${previewModeDesc} · 控件物理像素：拍摄86dp=${pxCap}px · 音乐190×44dp=${pxMusicW}×${pxMusicH}px · 返回Leading44×44dp=${pxBack}×${pxBack}px（内边距10dp=${pxBackPad}px · 图标24dp=${pxBackIcon}px）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
@@ -2070,8 +2025,6 @@
     bottomGapSwitch.addEventListener("input", render);
     frameStyleSwitch.addEventListener("input", render);
     toolbarFollowFrameSwitch.addEventListener("input", render);
-    pixelOneToOneSwitch.addEventListener("change", render);
-
     setupRangeTicks();
     syncModelSliderByRange();
     render();
