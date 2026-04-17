@@ -1350,7 +1350,7 @@
         <span class="chip">屏幕比例：<strong id="ratioText">-</strong></span>
         <span class="chip">矩形尺寸：<strong id="rectSizeText">-</strong></span>
         <span class="chip">左右间距：<strong id="sideGapText">-</strong></span>
-        <span class="chip">距屏幕底部：<strong id="bottomGapText">-</strong></span>
+        <span class="chip">距底部Bar：<strong id="bottomGapText">-</strong></span>
         <span class="chip range-chip">当前区间：<strong id="rangeText">-</strong></span>
       </div>
 
@@ -1367,7 +1367,7 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          规则：<code>top = statusBarHeight</code>，且画幅到屏幕底部至少 <code id="bottomGapRuleText">62dp</code>，
+          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">62dp</code>，
           <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
@@ -1801,7 +1801,7 @@
 
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
-      let availableHeight = m.height - minGapToBottomBar - topBase;
+      let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
       frameFitOptions.classList.toggle("is-disabled", v2ExclusiveFrameFitOn);
       frameFitModeInputs.forEach((input) => {
         input.disabled = v2ExclusiveFrameFitOn;
@@ -1879,9 +1879,8 @@
       captureScale = fixedModeCompensationScale;
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
-      const bottomGapToScreenBottom = Math.max(0, m.height - (frameTop + rectH));
-      const bottomGapToBottomBarTop = Math.max(0, bottomBarTop - (frameTop + rectH));
-      const hasBottomBlackBar = bottomGapToBottomBarTop > 0;
+      const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
+      const hasBottomBlackBar = bottomGap > 0;
       // 拍摄按钮距离规则：
       // 统一按实际是否存在底部黑边判断：
       // 1. 有底部黑边时，容器底边距系统 bar 顶部 89dp
@@ -1929,9 +1928,9 @@
         gapLeftTag.hidden = true;
         gapRightTag.hidden = true;
       }
-      if (bottomGapToScreenBottom > 0) {
+      if (bottomGap > 0) {
         gapBottomTag.hidden = false;
-        gapBottomTag.textContent = `距屏幕底部 ${bottomGapToScreenBottom}dp`;
+        gapBottomTag.textContent = `距底部Bar ${bottomGap}dp`;
       } else {
         gapBottomTag.hidden = true;
       }
@@ -1943,11 +1942,11 @@
       ratioText.textContent = ratio;
       rectSizeText.textContent = `${rectW}×${rectH} dp`;
       sideGapText.textContent = sideGap > 0 ? `${sideGap}dp` : "无";
-      bottomGapText.textContent = `${bottomGapToScreenBottom}dp`;
+      bottomGapText.textContent = `${bottomGap}dp`;
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距屏幕底部：${bottomGapToScreenBottom}dp（最低 ${minGapToBottomBar}dp） · 距底部系统条：${bottomGapToBottomBarTop}dp · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
