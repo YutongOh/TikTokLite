@@ -1367,8 +1367,8 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          <strong>关（三键）</strong>：画幅底距<strong>三键栏顶</strong> ≥ <code id="bottomGapRuleText">62dp</code>；距<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">62+三键高</code>（<code id="bottomGapScreenSumText">62+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
-          <strong>开（手势）</strong>：画幅底距<strong>屏幕底</strong> <code id="bottomGapGestureHint">62dp</code>；拍摄容器底距屏底 <strong>89+16dp</strong>。<br />
+          <strong>勾选（三键）</strong>：画幅底距<strong>三键栏顶</strong> ≥ <code id="bottomGapRuleText">62dp</code>；距<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">62+三键高</code>（<code id="bottomGapScreenSumText">62+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
+          <strong>不勾选（手势）</strong>：画幅底距<strong>屏幕底</strong> <code id="bottomGapGestureHint">62dp</code>；拍摄容器底距屏底 <strong>89+16dp</strong>。<br />
           <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已扣底部预留；<code>h = w * 16 / 9</code>，超高则 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
@@ -1422,10 +1422,10 @@
       <section class="card mode-card bottom-gap-card switch-style-card">
         <h3 class="mode-card-title">适配底部导航</h3>
         <div class="mode-switch-row">
-          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="关三键导航：画幅距三键顶62；开手势导航：画幅距屏底62；拍摄89+16" />
-          <span class="mode-switch-note">关（三键）：画幅距三键顶 62｜开（手势）：画幅距屏底 62｜拍摄：89+16</span>
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="勾选三键：画幅距三键顶62；不勾选手势：画幅距屏底62；拍摄89+16" />
+          <span class="mode-switch-note">勾选（三键）：画幅距三键顶 62｜不勾选（手势）：画幅距屏底 62｜拍摄：89+16</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：三键 · 三键栏（按机型）· 画幅距三键顶 62dp</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：手势 · 画幅距屏底 62dp · 手势条示意 24dp</span>
       </section>
     </aside>
   </main>
@@ -1816,7 +1816,8 @@
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
       /** 开=手势导航，关=三键导航 */
-      const gestureNav = bottomGapSwitch.checked;
+      /** 勾选开关 = 三键导航；不勾选 = 手势导航（与早期版本相比已对调） */
+      const gestureNav = !bottomGapSwitch.checked;
       const threeKeyNavH = getThreeKeyNavHeightDp(m);
       const bottomBarHeight = gestureNav ? GESTURE_HOME_INDICATOR_DP : threeKeyNavH;
       bottomBar.style.height = `${bottomBarHeight}px`;
@@ -2015,7 +2016,7 @@
     function onFrameFitModeInput() {
       const sel = [...frameFitModeInputs].find((r) => r.checked);
       if (sel && sel.value === "contain") {
-        bottomGapSwitch.checked = true;
+        bottomGapSwitch.checked = false;
       }
       render();
     }
