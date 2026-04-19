@@ -1367,8 +1367,8 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          规则：<code>top = statusBarHeight</code>，且画幅到底部系统条至少 <code id="bottomGapRuleText">62dp</code>，
-          <code>h = w * 16 / 9</code>，若超高则反算 <code>w = availableHeight * 9 / 16</code>。
+          底部预留（任意画幅规则 / V2 智能适配均相同）：画幅底边到<strong>系统条上沿</strong> ≥ <code id="bottomGapRuleText">62dp</code>，到<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">86dp</code>（<code id="bottomGapScreenSumText">62+24</code>，指示条 <code id="bottomGapBarHeightText">24dp</code>）。<br />
+          <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已含该预留；<code>h = w * 16 / 9</code>，超高则 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
 
@@ -1421,10 +1421,10 @@
       <section class="card mode-card bottom-gap-card switch-style-card">
         <h3 class="mode-card-title">适配底部面板</h3>
         <div class="mode-switch-row">
-          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="适配底部面板：开保留68dp，关保留62dp" />
-          <span class="mode-switch-note">开：保留 68dp / 关：保留 62dp</span>
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="适配底部面板：关条上62屏底86dp，开条上68屏底92dp" />
+          <span class="mode-switch-note">关：条上 62dp／屏底 86dp（62+24）｜开：条上 68dp／屏底 92dp（68+24）</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 保留 62dp</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 条上 62dp · 屏底 86dp（62+24）</span>
       </section>
     </aside>
   </main>
@@ -1559,6 +1559,9 @@
     const toolbarFollowFrameSwitch = document.getElementById("toolbarFollowFrameSwitch");
     const toolbarFollowFrameSwitchLabel = document.getElementById("toolbarFollowFrameSwitchLabel");
     const bottomGapRuleText = document.getElementById("bottomGapRuleText");
+    const bottomGapScreenRuleText = document.getElementById("bottomGapScreenRuleText");
+    const bottomGapScreenSumText = document.getElementById("bottomGapScreenSumText");
+    const bottomGapBarHeightText = document.getElementById("bottomGapBarHeightText");
     const bottomBar = document.getElementById("bottomBar");
     const gapLeftTag = document.getElementById("gapLeftTag");
     const gapRightTag = document.getElementById("gapRightTag");
@@ -1794,10 +1797,14 @@
       const defaultBottomGap = 62;
       const expandedBottomGap = 68;
       const minGapToBottomBar = enforceBottomGap ? expandedBottomGap : defaultBottomGap;
+      const minGapToScreenBottom = minGapToBottomBar + bottomBarHeight;
       bottomGapSwitchLabel.textContent = enforceBottomGap
-        ? `当前状态：启用 · 保留 ${minGapToBottomBar}dp`
-        : `当前状态：关闭 · 保留 ${minGapToBottomBar}dp`;
+        ? `当前状态：启用 · 条上 ${minGapToBottomBar}dp · 屏底 ${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}）`
+        : `当前状态：关闭 · 条上 ${minGapToBottomBar}dp · 屏底 ${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}）`;
       bottomGapRuleText.textContent = `${minGapToBottomBar}dp`;
+      bottomGapScreenRuleText.textContent = `${minGapToScreenBottom}dp`;
+      bottomGapScreenSumText.textContent = `${minGapToBottomBar}+${bottomBarHeight}`;
+      bottomGapBarHeightText.textContent = `${bottomBarHeight}dp`;
 
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
@@ -1946,7 +1953,7 @@
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统底部指示条：${bottomBarHeight}dp · 距底部系统条：${bottomGap}dp（最低 ${minGapToBottomBar}dp） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统指示条高度：${bottomBarHeight}dp · 画幅底→系统条上沿：${bottomGap}dp（规则最低 ${minGapToBottomBar}dp） · 画幅底→屏底(规则最小)：${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
