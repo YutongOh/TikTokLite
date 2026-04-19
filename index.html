@@ -1385,11 +1385,11 @@
       <section class="card mode-card">
         <h3 class="mode-card-title">画幅展示规则</h3>
         <div id="frameFitOptions" class="frame-fit-options">
-          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="contain" /><span>9:16 完全展示</span></label>
-          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-width" checked /><span>9:16 撑满宽度（线上）</span></label>
+          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="contain" /><span>线上规则</span></label>
+          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-width" checked /><span>撑满宽度</span></label>
           <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-height" /><span>9:16 撑满高度</span></label>
         </div>
-        <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：9:16 撑满宽度（线上）</span>
+        <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：撑满宽度</span>
       </section>
 
       <section class="card mode-card frame-style-card">
@@ -1796,8 +1796,8 @@
       rangeSlider.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, rangePercent))}%`);
       const selectedFrameFitMode = [...frameFitModeInputs].find((input) => input.checked)?.value || "cover-width";
       const frameFitLabelMap = {
-        "contain": "9:16 完全展示",
-        "cover-width": "9:16 撑满宽度（线上）",
+        "contain": "线上规则",
+        "cover-width": "撑满宽度",
         "cover-height": "9:16 撑满高度",
       };
       const frameTopOn = frameTopSwitch.checked;
@@ -1846,9 +1846,16 @@
       if (v2ExclusiveFrameFitOn) {
         const fullHeightFrameW = Math.round(availableHeight * 9 / 16);
         frameFitMode = fullHeightFrameW < m.width ? "cover-width" : "cover-height";
+      } else if (selectedFrameFitMode === "contain") {
+        /** 线上规则：按撑满高度计算画幅，并配合默认打开底部导航（手势） */
+        frameFitMode = "cover-height";
       }
       const frameFitStatusPrefix = v2ExclusiveFrameFitOn ? "当前状态：V2 专属 · " : "当前状态：";
-      frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${frameFitLabelMap[frameFitMode] || "9:16 撑满宽度（线上）"}`;
+      if (!v2ExclusiveFrameFitOn && selectedFrameFitMode === "contain") {
+        frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}线上规则 · 画幅撑满高度`;
+      } else {
+        frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${frameFitLabelMap[frameFitMode] || "撑满宽度"}`;
+      }
       frameTopSwitchLabel.textContent = frameTopOn
         ? (v2ExclusiveFrameFitOn ? "当前状态：通顶 · V2专属画幅规则开启" : "当前状态：通顶（覆盖顶部 bar）")
         : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2专属画幅规则开启（自动选撑满高/宽）" : "当前状态：不通顶");
@@ -2005,7 +2012,14 @@
       render();
     });
     modelSlider.addEventListener("input", render);
-    frameFitModeInputs.forEach((input) => input.addEventListener("input", render));
+    function onFrameFitModeInput() {
+      const sel = [...frameFitModeInputs].find((r) => r.checked);
+      if (sel && sel.value === "contain") {
+        bottomGapSwitch.checked = true;
+      }
+      render();
+    }
+    frameFitModeInputs.forEach((input) => input.addEventListener("input", onFrameFitModeInput));
     frameTopSwitch.addEventListener("input", render);
     frameTopExclusiveFitSwitch.addEventListener("input", render);
     bottomGapSwitch.addEventListener("input", render);
