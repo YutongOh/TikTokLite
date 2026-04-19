@@ -821,11 +821,11 @@
     .metrics {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(3, 40px);
+      grid-template-rows: repeat(4, 40px);
       gap: 8px;
-      height: 136px;
-      min-height: 136px;
-      max-height: 136px;
+      height: 176px;
+      min-height: 176px;
+      max-height: 176px;
       overflow: hidden;
     }
 
@@ -1207,10 +1207,10 @@
       }
       .metrics {
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: repeat(3, 42px);
-        height: 142px;
-        min-height: 142px;
-        max-height: 142px;
+        grid-template-rows: repeat(4, 42px);
+        height: 186px;
+        min-height: 186px;
+        max-height: 186px;
       }
       .slider-box {
         min-height: 420px;
@@ -1351,6 +1351,7 @@
         <span class="chip">矩形尺寸：<strong id="rectSizeText">-</strong></span>
         <span class="chip">左右间距：<strong id="sideGapText">-</strong></span>
         <span class="chip">距底部Bar：<strong id="bottomGapText">-</strong></span>
+        <span class="chip">预览槽(dp比)：<strong id="previewSlotText">-</strong></span>
         <span class="chip range-chip">当前区间：<strong id="rangeText">-</strong></span>
       </div>
 
@@ -1574,9 +1575,37 @@
     const rectSizeText = document.getElementById("rectSizeText");
     const sideGapText = document.getElementById("sideGapText");
     const bottomGapText = document.getElementById("bottomGapText");
+    const previewSlotText = document.getElementById("previewSlotText");
     const modelTitle = document.getElementById("modelTitle");
     const modelSpec = document.getElementById("modelSpec");
     const modelLinkWrap = document.getElementById("modelLinkWrap");
+
+    const PREVIEW_REF_W = 360;
+    const PREVIEW_REF_H = 800;
+    const PREVIEW_REF_DIAG = Math.hypot(PREVIEW_REF_W, PREVIEW_REF_H);
+    const PREVIEW_SLOT_MIN_W = 260;
+    const PREVIEW_SLOT_MIN_H = 520;
+    const PREVIEW_SLOT_MAX_W = 420;
+    const PREVIEW_SLOT_MAX_H = 900;
+
+    function clampPreview(n, lo, hi) {
+      return Math.max(lo, Math.min(hi, n));
+    }
+
+    /**
+     * 预览槽按逻辑像素对角线相对参考机（360×800）成比例，再夹在 min/max 槽体；
+     * 槽内同一 scale 将整机画入，更接近真实 dp 占比。
+     */
+    function previewSlotAndScale(logicalW, logicalH) {
+      const rRaw = Math.hypot(logicalW, logicalH) / PREVIEW_REF_DIAG;
+      const minR = Math.max(PREVIEW_SLOT_MIN_W / PREVIEW_REF_W, PREVIEW_SLOT_MIN_H / PREVIEW_REF_H);
+      const maxR = Math.min(PREVIEW_SLOT_MAX_W / PREVIEW_REF_W, PREVIEW_SLOT_MAX_H / PREVIEW_REF_H);
+      const rUse = clampPreview(rRaw, minR, maxR);
+      const slotW = Math.round(PREVIEW_REF_W * rUse);
+      const slotH = Math.round(PREVIEW_REF_H * rUse);
+      const scale = Math.min(slotW / logicalW, slotH / logicalH);
+      return { slotW, slotH, scale, rUse };
+    }
 
     const RANGE_DEFS = [
       { key: "small", label: "小屏", helper: "h ≤ 640", match: (m) => m.height <= 640 },
@@ -1780,9 +1809,9 @@
       /** V2 第二个开关：可单独开启；开启后禁用「画幅展示规则」并按专属逻辑自动选 cover-height / cover-width */
       const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
 
-      const stageWidth = 360;
-      const stageHeight = 800;
-      const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
+      const { slotW, slotH, scale, rUse } = previewSlotAndScale(m.width, m.height);
+      phoneShell.style.width = `${slotW}px`;
+      phoneShell.style.height = `${slotH}px`;
       phone.style.width = `${m.width}px`;
       phone.style.height = `${m.height}px`;
       phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
@@ -1950,6 +1979,7 @@
       rectSizeText.textContent = `${rectW}×${rectH} dp`;
       sideGapText.textContent = sideGap > 0 ? `${sideGap}dp` : "无";
       bottomGapText.textContent = `${bottomGap}dp`;
+      previewSlotText.textContent = `${slotW}×${slotH}px · r${rUse.toFixed(2)} · ×${scale.toFixed(3)}`;
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
