@@ -558,6 +558,13 @@
       min-height: 176px;
       flex: 1 1 auto;
     }
+    .bottom-gap-card.is-disabled {
+      opacity: 0.48;
+      pointer-events: none;
+    }
+    .bottom-gap-card.is-disabled .mode-switch-note {
+      color: var(--on-surface-variant);
+    }
     .mode-card.frame-style-card {
       flex: 0 0 auto;
       min-height: 178px;
@@ -1419,7 +1426,7 @@
         <span id="frameTopSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：不通顶</span>
       </section>
 
-      <section class="card mode-card bottom-gap-card switch-style-card">
+      <section id="bottomGapCard" class="card mode-card bottom-gap-card switch-style-card">
         <h3 class="mode-card-title">适配底部导航</h3>
         <div class="mode-switch-row">
           <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="勾选三键：画幅距三键顶62；不勾选手势：画幅距屏底62；拍摄89+16" />
@@ -1554,6 +1561,7 @@
     const frameTopSwitchLabel = document.getElementById("frameTopSwitchLabel");
     const frameTopExclusiveFitSwitch = document.getElementById("frameTopExclusiveFitSwitch");
     const bottomGapSwitch = document.getElementById("bottomGapSwitch");
+    const bottomGapCard = document.getElementById("bottomGapCard");
     const bottomGapSwitchLabel = document.getElementById("bottomGapSwitchLabel");
     const frameStyleSwitch = document.getElementById("frameStyleSwitch");
     const frameStyleSwitchLabel = document.getElementById("frameStyleSwitchLabel");
@@ -1803,6 +1811,8 @@
       const frameTopOn = frameTopSwitch.checked;
       /** V2 第二个开关：可单独开启；开启后禁用「画幅展示规则」并按专属逻辑自动选 cover-height / cover-width */
       const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
+      /** 线上规则：固定三键画幅几何（画幅距三键顶 62dp）+ 拍摄距屏底 89+16dp，且不跟随「适配底部导航」开关 */
+      const onlineRuleLayout = selectedFrameFitMode === "contain" && !v2ExclusiveFrameFitOn;
 
       const stageWidth = 360;
       const stageHeight = 800;
@@ -1815,16 +1825,19 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      /** 开=手势导航，关=三键导航 */
-      /** 勾选开关 = 三键导航；不勾选 = 手势导航（与早期版本相比已对调） */
-      const gestureNav = !bottomGapSwitch.checked;
+      /** 勾选开关 = 三键导航；不勾选 = 手势导航（与早期版本相比已对调）；线上规则时强制三键画幅几何并锁定开关 */
+      const gestureNav = onlineRuleLayout ? false : !bottomGapSwitch.checked;
       const threeKeyNavH = getThreeKeyNavHeightDp(m);
       const bottomBarHeight = gestureNav ? GESTURE_HOME_INDICATOR_DP : threeKeyNavH;
       bottomBar.style.height = `${bottomBarHeight}px`;
       const frameBottomInsetDp = gestureNav ? FRAME_BOTTOM_TO_REF_DP : (threeKeyNavH + FRAME_BOTTOM_TO_REF_DP);
       const minGapToBottomBar = FRAME_BOTTOM_TO_REF_DP;
       const minGapToScreenBottom = frameBottomInsetDp;
-      bottomGapSwitchLabel.textContent = gestureNav
+      bottomGapCard.classList.toggle("is-disabled", onlineRuleLayout);
+      bottomGapSwitch.disabled = onlineRuleLayout;
+      bottomGapSwitchLabel.textContent = onlineRuleLayout
+        ? `线上规则：画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 拍摄容器底距屏底 ${CAPTURE_BOTTOM_OFFSET_DP}dp（89+16）· 适配底部导航已锁定`
+        : gestureNav
         ? `当前状态：手势 · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}dp · 手势条示意 ${GESTURE_HOME_INDICATOR_DP}dp`
         : `当前状态：三键 · 三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅距屏底 ${minGapToScreenBottom}dp`;
       bottomGapRuleText.textContent = `${FRAME_BOTTOM_TO_REF_DP}dp`;
@@ -1848,7 +1861,7 @@
         const fullHeightFrameW = Math.round(availableHeight * 9 / 16);
         frameFitMode = fullHeightFrameW < m.width ? "cover-width" : "cover-height";
       } else if (selectedFrameFitMode === "contain") {
-        /** 线上规则：按撑满高度计算画幅，并配合默认打开底部导航（手势） */
+        /** 线上规则：按撑满高度计算画幅；底部采用三键几何 + 固定拍摄距屏底 */
         frameFitMode = "cover-height";
       }
       const frameFitStatusPrefix = v2ExclusiveFrameFitOn ? "当前状态：V2 专属 · " : "当前状态：";
@@ -1925,7 +1938,9 @@
       const captureSvgBottomPad = 0;
       const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
       const captureBottomToRefDp = CAPTURE_BOTTOM_OFFSET_DP;
-      const circleBottomInset = gestureNav ? CAPTURE_BOTTOM_OFFSET_DP : (threeKeyNavH + CAPTURE_BOTTOM_OFFSET_DP);
+      const circleBottomInset = onlineRuleLayout || gestureNav
+        ? CAPTURE_BOTTOM_OFFSET_DP
+        : (threeKeyNavH + CAPTURE_BOTTOM_OFFSET_DP);
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
@@ -1985,7 +2000,9 @@
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→${gestureNav ? "屏底" : "三键顶"}：${captureBottomToRefDp}dp（89+16） · 拍摄容器底→屏底：${gestureNav ? captureBottomToRefDp : (threeKeyNavH + captureBottomToRefDp)}dp`;
+      modelSpec.textContent = onlineRuleLayout
+        ? `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 线上规则：三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→屏底：${captureBottomToRefDp}dp（89+16）`
+        : `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→${gestureNav ? "屏底" : "三键顶"}：${captureBottomToRefDp}dp（89+16） · 拍摄容器底→屏底：${gestureNav ? captureBottomToRefDp : (threeKeyNavH + captureBottomToRefDp)}dp`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
@@ -2014,10 +2031,6 @@
     });
     modelSlider.addEventListener("input", render);
     function onFrameFitModeInput() {
-      const sel = [...frameFitModeInputs].find((r) => r.checked);
-      if (sel && sel.value === "contain") {
-        bottomGapSwitch.checked = false;
-      }
       render();
     }
     frameFitModeInputs.forEach((input) => input.addEventListener("input", onFrameFitModeInput));
