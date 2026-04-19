@@ -1403,11 +1403,11 @@
       <section class="card mode-card">
         <h3 class="mode-card-title">画幅展示规则</h3>
         <div id="frameFitOptions" class="frame-fit-options">
-          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="contain" /><span>线上规则</span></label>
-          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-width" checked /><span>撑满宽度</span></label>
+          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="contain" checked /><span>线上规则</span></label>
+          <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-width" /><span>撑满宽度</span></label>
           <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-height" /><span>9:16 撑满高度</span></label>
         </div>
-        <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：撑满宽度</span>
+        <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：线上规则 · 撑满高度（窄于屏时撑满宽，视窗居中裁剪）</span>
       </section>
 
       <section class="card mode-card frame-style-card">
@@ -1814,7 +1814,7 @@
         ? ((rangeIndex - rangeMin) / (rangeMax - rangeMin)) * 100
         : 0;
       rangeSlider.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, rangePercent))}%`);
-      const selectedFrameFitMode = [...frameFitModeInputs].find((input) => input.checked)?.value || "cover-width";
+      const selectedFrameFitMode = [...frameFitModeInputs].find((input) => input.checked)?.value || "contain";
       const frameFitLabelMap = {
         "contain": "线上规则",
         "cover-width": "撑满宽度",
