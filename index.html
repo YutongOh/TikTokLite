@@ -1350,7 +1350,7 @@
         <span class="chip">屏幕比例：<strong id="ratioText">-</strong></span>
         <span class="chip">矩形尺寸：<strong id="rectSizeText">-</strong></span>
         <span class="chip">左右间距：<strong id="sideGapText">-</strong></span>
-        <span class="chip">距底部Bar：<strong id="bottomGapText">-</strong></span>
+        <span class="chip">距导航参考：<strong id="bottomGapText">-</strong></span>
         <span class="chip range-chip">当前区间：<strong id="rangeText">-</strong></span>
       </div>
 
@@ -1367,8 +1367,9 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          底部预留（任意画幅规则 / V2 智能适配均相同）：画幅底边到<strong>系统条上沿</strong> ≥ <code id="bottomGapRuleText">62dp</code>，到<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">86dp</code>（<code id="bottomGapScreenSumText">62+24</code>，指示条 <code id="bottomGapBarHeightText">24dp</code>）。<br />
-          <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已含该预留；<code>h = w * 16 / 9</code>，超高则 <code>w = availableHeight * 9 / 16</code>。
+          <strong>关（三键）</strong>：画幅底距<strong>三键栏顶</strong> ≥ <code id="bottomGapRuleText">62dp</code>；距<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">62+三键高</code>（<code id="bottomGapScreenSumText">62+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
+          <strong>开（手势）</strong>：画幅底距<strong>屏幕底</strong> <code id="bottomGapGestureHint">62dp</code>；拍摄容器底距屏底 <strong>89+16dp</strong>。<br />
+          <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已扣底部预留；<code>h = w * 16 / 9</code>，超高则 <code>w = availableHeight * 9 / 16</code>。
         </p>
       </div>
 
@@ -1419,12 +1420,12 @@
       </section>
 
       <section class="card mode-card bottom-gap-card switch-style-card">
-        <h3 class="mode-card-title">适配底部面板</h3>
+        <h3 class="mode-card-title">适配底部导航</h3>
         <div class="mode-switch-row">
-          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="适配底部面板：关条上62屏底86dp，开条上68屏底92dp" />
-          <span class="mode-switch-note">关：条上 62dp／屏底 86dp（62+24）｜开：条上 68dp／屏底 92dp（68+24）</span>
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="关三键导航：画幅距三键顶62；开手势导航：画幅距屏底62；拍摄89+16" />
+          <span class="mode-switch-note">关（三键）：画幅距三键顶 62｜开（手势）：画幅距屏底 62｜拍摄：89+16</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：关闭 · 条上 62dp · 屏底 86dp（62+24）</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：三键 · 三键栏（按机型）· 画幅距三键顶 62dp</span>
       </section>
     </aside>
   </main>
@@ -1443,7 +1444,7 @@
       { name: "Galaxy S10", width: 360, height: 760, official: "https://www.gsmarena.com/samsung_galaxy_s10-9536.php" },
       { name: "Galaxy S23", width: 360, height: 780, official: "https://www.gsmarena.com/samsung_galaxy_s23-12082.php" },
       { name: "Galaxy S24", width: 360, height: 780, official: "https://www.gsmarena.com/samsung_galaxy_s24-12773.php" },
-      { name: "Samsung Custom 360x792", width: 360, height: 792, official: "https://www.samsung.com/" },
+      { name: "Samsung Custom 360x792", width: 360, height: 792, threeKeyNavHeight: 40, official: "https://www.samsung.com/" },
       { name: "Galaxy S21", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s21_5g-10626.php" },
       { name: "Galaxy S22", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s22_5g-11253.php" },
       { name: "Galaxy S25", width: 360, height: 800, official: "https://www.gsmarena.com/samsung_galaxy_s25-13610.php" },
@@ -1577,6 +1578,29 @@
     const modelTitle = document.getElementById("modelTitle");
     const modelSpec = document.getElementById("modelSpec");
     const modelLinkWrap = document.getElementById("modelLinkWrap");
+
+    /** 三键导航栏高度 (dp)；未列出的尺寸用默认，可补 THREE_KEY_NAV_HEIGHT_BY_SIZE 或机型字段 threeKeyNavHeight */
+    const THREE_KEY_NAV_HEIGHT_DEFAULT_DP = 48;
+    const THREE_KEY_NAV_HEIGHT_BY_SIZE = {
+      "360x792": 40,
+      "360x800": 48,
+      "360x780": 44,
+      "412x915": 48,
+      "393x873": 48,
+    };
+    const FRAME_BOTTOM_TO_REF_DP = 62;
+    const CAPTURE_BOTTOM_OFFSET_DP = 89 + 16;
+    const GESTURE_HOME_INDICATOR_DP = 24;
+
+    function getThreeKeyNavHeightDp(model) {
+      if (model && typeof model.threeKeyNavHeight === "number") return model.threeKeyNavHeight;
+      const key = `${model.width}x${model.height}`;
+      if (Object.prototype.hasOwnProperty.call(THREE_KEY_NAV_HEIGHT_BY_SIZE, key)) {
+        return THREE_KEY_NAV_HEIGHT_BY_SIZE[key];
+      }
+      return THREE_KEY_NAV_HEIGHT_DEFAULT_DP;
+    }
+
 
     const RANGE_DEFS = [
       { key: "small", label: "小屏", helper: "h ≤ 640", match: (m) => m.height <= 640 },
@@ -1791,24 +1815,29 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      const bottomBarHeight = 24;
+      /** 开=手势导航，关=三键导航 */
+      const gestureNav = bottomGapSwitch.checked;
+      const threeKeyNavH = getThreeKeyNavHeightDp(m);
+      const bottomBarHeight = gestureNav ? GESTURE_HOME_INDICATOR_DP : threeKeyNavH;
       bottomBar.style.height = `${bottomBarHeight}px`;
-      const enforceBottomGap = bottomGapSwitch.checked;
-      const defaultBottomGap = 62;
-      const expandedBottomGap = 68;
-      const minGapToBottomBar = enforceBottomGap ? expandedBottomGap : defaultBottomGap;
-      const minGapToScreenBottom = minGapToBottomBar + bottomBarHeight;
-      bottomGapSwitchLabel.textContent = enforceBottomGap
-        ? `当前状态：启用 · 条上 ${minGapToBottomBar}dp · 屏底 ${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}）`
-        : `当前状态：关闭 · 条上 ${minGapToBottomBar}dp · 屏底 ${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}）`;
-      bottomGapRuleText.textContent = `${minGapToBottomBar}dp`;
+      const frameBottomInsetDp = gestureNav ? FRAME_BOTTOM_TO_REF_DP : (threeKeyNavH + FRAME_BOTTOM_TO_REF_DP);
+      const minGapToBottomBar = FRAME_BOTTOM_TO_REF_DP;
+      const minGapToScreenBottom = frameBottomInsetDp;
+      bottomGapSwitchLabel.textContent = gestureNav
+        ? `当前状态：手势 · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}dp · 手势条示意 ${GESTURE_HOME_INDICATOR_DP}dp`
+        : `当前状态：三键 · 三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅距屏底 ${minGapToScreenBottom}dp`;
+      bottomGapRuleText.textContent = `${FRAME_BOTTOM_TO_REF_DP}dp`;
       bottomGapScreenRuleText.textContent = `${minGapToScreenBottom}dp`;
-      bottomGapScreenSumText.textContent = `${minGapToBottomBar}+${bottomBarHeight}`;
-      bottomGapBarHeightText.textContent = `${bottomBarHeight}dp`;
+      bottomGapScreenSumText.textContent = gestureNav
+        ? `${FRAME_BOTTOM_TO_REF_DP}`
+        : `${FRAME_BOTTOM_TO_REF_DP}+${threeKeyNavH}`;
+      bottomGapBarHeightText.textContent = gestureNav
+        ? `${GESTURE_HOME_INDICATOR_DP}dp`
+        : `${threeKeyNavH}dp`;
 
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
-      let availableHeight = bottomBarTop - minGapToBottomBar - topBase;
+      let availableHeight = m.height - frameBottomInsetDp - topBase;
       frameFitOptions.classList.toggle("is-disabled", v2ExclusiveFrameFitOn);
       frameFitModeInputs.forEach((input) => {
         input.disabled = v2ExclusiveFrameFitOn;
@@ -1887,13 +1916,8 @@
       circleSize = 86 / scale;
       const captureSvgBottomPad = 0;
       const bottomGap = Math.max(0, bottomBarTop - (frameTop + rectH));
-      const hasBottomBlackBar = bottomGap > 0;
-      // 拍摄按钮距离规则：
-      // 统一按实际是否存在底部黑边判断：
-      // 1. 有底部黑边时，容器底边距系统 bar 顶部 89dp
-      // 2. 无底部黑边时，容器底边距系统 bar 顶部 40dp
-      const captureBottomToSystemBarTopDp = hasBottomBlackBar ? 89 : 40;
-      const circleBottomInset = bottomBarHeight + captureBottomToSystemBarTopDp;
+      const captureBottomToRefDp = CAPTURE_BOTTOM_OFFSET_DP;
+      const circleBottomInset = gestureNav ? CAPTURE_BOTTOM_OFFSET_DP : (threeKeyNavH + CAPTURE_BOTTOM_OFFSET_DP);
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
@@ -1937,7 +1961,7 @@
       }
       if (bottomGap > 0) {
         gapBottomTag.hidden = false;
-        gapBottomTag.textContent = `距底部Bar ${bottomGap}dp`;
+        gapBottomTag.textContent = gestureNav ? `画幅距屏底区 ${bottomGap}dp` : `画幅距三键顶 ${bottomGap}dp`;
       } else {
         gapBottomTag.hidden = true;
       }
@@ -1953,7 +1977,7 @@
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
 
       modelTitle.textContent = m.name;
-      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 系统指示条高度：${bottomBarHeight}dp · 画幅底→系统条上沿：${bottomGap}dp（规则最低 ${minGapToBottomBar}dp） · 画幅底→屏底(规则最小)：${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}） · 拍摄按钮底边距底栏顶：${captureBottomToSystemBarTopDp}dp（${hasBottomBlackBar ? "有底部黑边→89" : "无底部黑边→40"}）`;
+      modelSpec.textContent = `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→${gestureNav ? "屏底" : "三键顶"}：${captureBottomToRefDp}dp（89+16） · 拍摄容器底→屏底：${gestureNav ? captureBottomToRefDp : (threeKeyNavH + captureBottomToRefDp)}dp`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
