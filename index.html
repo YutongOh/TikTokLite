@@ -1780,18 +1780,9 @@
       /** V2 第二个开关：可单独开启；开启后禁用「画幅展示规则」并按专属逻辑自动选 cover-height / cover-width */
       const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
 
-      const enforceBottomGap = bottomGapSwitch.checked;
-      const defaultBottomGap = 62;
-      const expandedBottomGap = 68;
-      const minGapToBottomBar = enforceBottomGap ? expandedBottomGap : defaultBottomGap;
-
       const stageWidth = 360;
       const stageHeight = 800;
-      const sFit = Math.min(stageWidth / m.width, stageHeight / m.height);
-      /** Preview-only: keep bottom reserve (minGap dp) ~constant on screen across models */
-      const BOTTOM_GAP_TARGET_SCREEN_PX = 50;
-      const sByGap = BOTTOM_GAP_TARGET_SCREEN_PX / minGapToBottomBar;
-      const scale = Math.min(sFit, sByGap);
+      const scale = Math.min(stageWidth / m.width, stageHeight / m.height);
       phone.style.width = `${m.width}px`;
       phone.style.height = `${m.height}px`;
       phone.style.transform = `translate(-50%, -50%) scale(${scale})`;
@@ -1802,6 +1793,10 @@
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
       const bottomBarHeight = 24;
       bottomBar.style.height = `${bottomBarHeight}px`;
+      const enforceBottomGap = bottomGapSwitch.checked;
+      const defaultBottomGap = 62;
+      const expandedBottomGap = 68;
+      const minGapToBottomBar = enforceBottomGap ? expandedBottomGap : defaultBottomGap;
       const minGapToScreenBottom = minGapToBottomBar + bottomBarHeight;
       bottomGapSwitchLabel.textContent = enforceBottomGap
         ? `当前状态：启用 · 条上 ${minGapToBottomBar}dp · 屏底 ${minGapToScreenBottom}dp（${minGapToBottomBar}+${bottomBarHeight}）`
