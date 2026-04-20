@@ -1934,9 +1934,20 @@
         : Math.max(0, Math.round((availableHeight - rectH) / 2));
       const frameTop = topBase + frameTopOffset;
       const frameRadiusPx = frameStyleOn ? 20 : 0;
-      cameraRect.style.borderRadius = frameRadiusPx ? `${frameRadiusPx}px` : "0";
+      /** 圆角加在裁剪视窗（cameraRectClip）上：先按视窗裁剪，再对可见区域做圆角，避免内层先圆角再裁导致角不贴边 */
+      if (frameRadiusPx) {
+        cameraRectClip.style.borderRadius = `${frameRadiusPx}px`;
+        cameraRectClip.style.boxShadow = "inset 0 0 0 1px rgba(255, 255, 255, 0.08)";
+        cameraRect.style.borderRadius = "0";
+        cameraRect.style.setProperty("box-shadow", "none");
+      } else {
+        cameraRectClip.style.borderRadius = "0";
+        cameraRectClip.style.boxShadow = "none";
+        cameraRect.style.borderRadius = "0";
+        cameraRect.style.removeProperty("box-shadow");
+      }
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20dp"
+        ? "当前状态：开启 · 圆角 20dp（裁剪视窗外框）"
         : "当前状态：关闭 · 无圆角";
       v1ForceCoverHeightSwitchLabel.textContent = v1ForceCoverHeightOn
         ? "当前状态：开启 · 画幅展示规则置灰 · 固定撑满高度"
