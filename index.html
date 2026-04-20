@@ -1397,6 +1397,7 @@
           <strong>勾选（三键）</strong>：画幅底距<strong>三键栏顶</strong> ≥ <code id="bottomGapRuleText">62dp</code>；距<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">62+三键高</code>（<code id="bottomGapScreenSumText">62+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
           <strong>不勾选（手势）</strong>：画幅底距<strong>屏幕底</strong> <code id="bottomGapGestureHint">62dp</code>；拍摄容器底距屏底 <strong>89+16dp</strong>。<br />
           <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已扣底部预留。<br />
+          <strong>线上规则</strong>：<strong>撑满高度</strong>——<code>h = availableHeight</code>，<code>w = h × 9/16</code>；在 <code>屏宽 × availableHeight</code> 视窗内水平居中，<strong>宽超出屏宽时裁左右</strong>（仍 9:16）。<br />
           <strong>9:16 撑满高度</strong>：先 <code>h = availableHeight</code>、<code>w = h × 9/16</code>；若 <code>w &lt; 屏宽</code> 则改为 <code>w = 屏宽</code>、<code>h = w × 16/9</code>；在 <code>屏宽 × availableHeight</code> 视窗内<strong>居中裁剪</strong>多余宽与高（仍 9:16）。
         </p>
       </div>
@@ -1417,7 +1418,7 @@
           <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-width" /><span>撑满宽度</span></label>
           <label class="frame-fit-option"><input type="radio" name="frameFitMode" value="cover-height" /><span>9:16 撑满高度</span></label>
         </div>
-        <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：线上规则 · 撑满高度（窄则再满宽，视窗裁高宽）</span>
+        <span id="frameFitSwitchLabel" class="mode-switch-label">当前状态：线上规则 · 撑满高度</span>
       </section>
 
       <section class="card mode-card frame-style-card">
@@ -1898,7 +1899,7 @@
       } else if (v1ForceCoverHeightOn) {
         frameFitSwitchLabel.textContent = "当前状态：V1 · 固定撑满高度（画幅展示规则已置灰）";
       } else if (selectedFrameFitMode === "contain") {
-        frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}线上规则 · 撑满高度（窄则再满宽，视窗裁高宽）`;
+        frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}线上规则 · 撑满高度`;
       } else if (selectedFrameFitMode === "cover-height") {
         frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}9:16 撑满高度（窄则再满宽，视窗裁高宽）`;
       } else {
@@ -1910,7 +1911,7 @@
 
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
-      /** 9:16 撑满高度：先 h=availableHeight、w=h×9/16；若 w<屏宽则 w=屏宽、h=w×16/9；视窗内居中裁掉多余宽高 */
+      /** 线上规则：仅撑满高度（宽出裁左右）。9:16 撑满高度选项：窄则再满宽，视窗裁高宽。 */
       let useCoverHeightCrop = false;
       if (frameFitMode === "contain") {
         if (rectH > availableHeight) {
@@ -1924,7 +1925,8 @@
       } else if (frameFitMode === "cover-height") {
         useCoverHeightCrop = true;
         const hFillW = Math.round(availableHeight * 9 / 16);
-        if (hFillW < m.width) {
+        const onlineFillHeightOnly = selectedFrameFitMode === "contain";
+        if (!onlineFillHeightOnly && hFillW < m.width) {
           rectW = m.width;
           rectH = Math.round(m.width * 16 / 9);
         } else {
@@ -2076,7 +2078,9 @@
       sizeText.textContent = `${m.width}×${m.height} dp`;
       ratioText.textContent = ratio;
       rectSizeText.textContent = useCoverHeightCrop
-        ? `${rectW}×${rectH}（视窗 ${m.width}×${availableHeight} · 居中裁高宽）`
+        ? (onlineRuleLayout
+          ? `${rectW}×${rectH}（视窗 ${m.width}×${availableHeight} · 撑满高度 · 宽出裁左右）`
+          : `${rectW}×${rectH}（视窗 ${m.width}×${availableHeight} · 居中裁高宽）`)
         : `${rectW}×${rectH} dp`;
       sideGapText.textContent = sideGap > 0 ? `${sideGap}dp` : "无";
       bottomGapText.textContent = `${bottomGap}dp`;
@@ -2084,7 +2088,7 @@
 
       modelTitle.textContent = m.name;
       modelSpec.textContent = onlineRuleLayout
-        ? `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 线上规则：三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅层 ${rectW}×${rectH} 于视窗 ${m.width}×${availableHeight}（撑满高；窄则满宽；居中裁高宽） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→屏底：${captureBottomToRefDp}dp（89+16）`
+        ? `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 线上规则：三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅层 ${rectW}×${rectH} 于视窗 ${m.width}×${availableHeight}（撑满高度，宽出裁左右） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→屏底：${captureBottomToRefDp}dp（89+16）`
         : `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→${gestureNav ? "屏底" : "三键顶"}：${captureBottomToRefDp}dp（89+16） · 拍摄容器底→屏底：${gestureNav ? captureBottomToRefDp : (threeKeyNavH + captureBottomToRefDp)}dp`;
       modelLinkWrap.innerHTML = "";
 
