@@ -1973,9 +1973,12 @@
       const layoutScale = fixedModeCompensationScale;
       // Right toolbar scales from 56x354 at 360x800 baseline.
       const uiScale = fixedModeCompensationScale;
+      /** 通顶时画幅顶为 0，但顶栏控件须落在状态栏安全区以下，避免与系统状态图标重叠 */
+      const toolbarTopByFrame = Math.round(frameTop + 16 * uiScale);
+      const toolbarTopMinSafe = Math.round(m.statusBarHeight + 16 * uiScale);
       const toolbarTop = toolbarFollowFrameOn
-        ? Math.round(frameTop + 16 * uiScale)
-        : Math.round(m.statusBarHeight + 16 * uiScale);
+        ? Math.max(toolbarTopByFrame, toolbarTopMinSafe)
+        : toolbarTopMinSafe;
       rightTools.style.top = `${toolbarTop}px`;
       rightTools.style.width = "56px";
       rightTools.style.height = "354px";
