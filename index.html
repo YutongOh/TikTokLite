@@ -1394,8 +1394,8 @@
           <div id="modelCurrent" class="model-current">当前机型：-</div>
         </div>
         <p class="formula">
-          <strong>勾选（三键）</strong>：画幅底距<strong>三键栏顶</strong> ≥ <code id="bottomGapRuleText">62dp</code>；距<strong>屏幕底</strong> ≥ <code id="bottomGapScreenRuleText">62+三键高</code>（<code id="bottomGapScreenSumText">62+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
-          <strong>不勾选（手势）</strong>：画幅底距<strong>屏幕底</strong> <code id="bottomGapGestureHint">62dp</code>；拍摄容器底距屏底 <strong>89+16dp</strong>。<br />
+          <strong>勾选（三键）</strong>：画幅底距<strong>三键栏顶</strong> <code id="bottomGapRuleText">64dp</code>；画幅底距<strong>屏幕底</strong> <code id="bottomGapScreenRuleText">64+三键高</code>（<code id="bottomGapScreenSumText">64+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
+          <strong>不勾选（手势）</strong>：画幅底距<strong>手势导航参考</strong> <code id="bottomGapGestureHint">64dp</code>；画幅底距<strong>屏幕底</strong> <strong>64+24dp</strong>。<br />
           <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已扣底部预留。<br />
           <strong>线上规则</strong>：<strong>撑满高度</strong>——<code>h = availableHeight</code>，<code>w = h × 9/16</code>；在 <code>屏宽 × availableHeight</code> 视窗内水平居中，<strong>宽超出屏宽时裁左右</strong>（仍 9:16）。<br />
           <strong>9:16 撑满高度</strong>：先 <code>h = availableHeight</code>、<code>w = h × 9/16</code>；若 <code>w &lt; 屏宽</code> 则改为 <code>w = 屏宽</code>、<code>h = w × 16/9</code>；在 <code>屏宽 × availableHeight</code> 视窗内<strong>居中裁剪</strong>多余宽与高（仍 9:16）。
@@ -1424,8 +1424,8 @@
       <section class="card mode-card frame-style-card">
         <h3 class="mode-card-title">V1 圆角与画幅规则</h3>
         <div class="mode-switch-row">
-          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="关：无圆角；开：圆角 20dp" />
-          <span class="mode-switch-note">关：无圆角 · 开：圆角 20dp</span>
+          <input id="frameStyleSwitch" class="mode-switch" type="checkbox" aria-label="开：圆角 20dp；拍摄钮距画幅底 24dp，tab 随拍摄钮" />
+          <span class="mode-switch-note">关：无圆角 · 开：圆角 20dp · 拍摄钮距画幅底 24dp（tab 随拍摄钮）</span>
         </div>
         <div class="mode-switch-row">
           <input id="v1ForceCoverHeightSwitch" class="mode-switch" type="checkbox" aria-label="开：置灰画幅规则并固定撑满高度规则（窄于屏则再满宽并裁切）；关：自选画幅展示规则" />
@@ -1438,8 +1438,8 @@
       <section class="card mode-card switch-style-card">
         <h3 class="mode-card-title">V2 画幅通顶</h3>
         <div class="mode-switch-row">
-          <input id="frameTopSwitch" class="mode-switch" type="checkbox" aria-label="切换画幅通顶" />
-          <span class="mode-switch-note">开：通顶覆盖顶部 bar / 关：不通顶（现状）</span>
+          <input id="frameTopSwitch" class="mode-switch" type="checkbox" aria-label="开：通顶；拍摄钮距画幅底 24dp，tab 随拍摄钮" />
+          <span class="mode-switch-note">开：通顶覆盖顶部 bar · 拍摄钮距画幅底 24dp（tab 随拍摄钮）/ 关：不通顶</span>
         </div>
         <div class="mode-switch-row">
           <input id="frameTopExclusiveFitSwitch" class="mode-switch" type="checkbox" aria-label="开：智能适配高/宽；关：自选展示规则（开则置灰画幅展示）" />
@@ -1451,10 +1451,10 @@
       <section id="bottomGapCard" class="card mode-card bottom-gap-card switch-style-card">
         <h3 class="mode-card-title">适配底部导航</h3>
         <div class="mode-switch-row">
-          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="勾选三键：画幅距三键顶62；不勾选手势：画幅距屏底62；拍摄89+16" />
-          <span class="mode-switch-note">勾选（三键）：画幅距三键顶 62｜不勾选（手势）：画幅距屏底 62｜拍摄：89+16</span>
+          <input id="bottomGapSwitch" class="mode-switch" type="checkbox" aria-label="三键：画幅距三键顶64、距屏底64+三键高；手势：距手势条64、距屏底64+24" />
+          <span class="mode-switch-note">勾选（三键）：画幅距三键顶 64｜距屏底 64+三键高（约 40～48）· 不勾选（手势）：距手势导航 64｜距屏底 64+24</span>
         </div>
-        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：手势 · 画幅距屏底 62dp · 手势条示意 24dp</span>
+        <span id="bottomGapSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：手势 · 距手势导航 64dp · 距屏底 64+24dp</span>
       </section>
     </aside>
   </main>
@@ -1619,9 +1619,11 @@
       "412x915": 48,
       "393x873": 48,
     };
-    const FRAME_BOTTOM_TO_REF_DP = 62;
-    const CAPTURE_BOTTOM_OFFSET_DP = 89 + 16;
+    /** 画幅底相对参考：手势距手势条顶、三键距三键栏顶 */
+    const FRAME_BOTTOM_TO_REF_DP = 64;
     const GESTURE_HOME_INDICATOR_DP = 24;
+    /** 拍摄钮距屏底（未启用「相对画幅底 24dp」时）：手势 64+24+24；三键 64+三键高+24 */
+    const CAPTURE_FROM_FRAME_BOTTOM_DP = 24;
 
     function getThreeKeyNavHeightDp(model) {
       if (model && typeof model.threeKeyNavHeight === "number") return model.threeKeyNavHeight;
@@ -1856,20 +1858,23 @@
       const threeKeyNavH = getThreeKeyNavHeightDp(m);
       const bottomBarHeight = gestureNav ? GESTURE_HOME_INDICATOR_DP : threeKeyNavH;
       bottomBar.style.height = `${bottomBarHeight}px`;
-      const frameBottomInsetDp = gestureNav ? FRAME_BOTTOM_TO_REF_DP : (threeKeyNavH + FRAME_BOTTOM_TO_REF_DP);
+      /** 手势：距屏底 64+24；三键：距屏底 64+三键高 */
+      const frameBottomInsetDp = gestureNav
+        ? FRAME_BOTTOM_TO_REF_DP + GESTURE_HOME_INDICATOR_DP
+        : threeKeyNavH + FRAME_BOTTOM_TO_REF_DP;
       const minGapToBottomBar = FRAME_BOTTOM_TO_REF_DP;
       const minGapToScreenBottom = frameBottomInsetDp;
       bottomGapCard.classList.toggle("is-disabled", onlineRuleLayout);
       bottomGapSwitch.disabled = onlineRuleLayout;
       bottomGapSwitchLabel.textContent = onlineRuleLayout
-        ? `线上规则：画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 拍摄容器底距屏底 ${CAPTURE_BOTTOM_OFFSET_DP}dp（89+16）· 适配底部导航已锁定`
+        ? `线上规则：三键 · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 距屏底 ${FRAME_BOTTOM_TO_REF_DP}+${threeKeyNavH}dp · 圆角/通顶开时拍摄距画幅底 24dp · 适配底部导航已锁定`
         : gestureNav
-        ? `当前状态：手势 · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}dp · 手势条示意 ${GESTURE_HOME_INDICATOR_DP}dp`
-        : `当前状态：三键 · 三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅距屏底 ${minGapToScreenBottom}dp`;
+        ? `当前状态：手势 · 距手势导航 ${FRAME_BOTTOM_TO_REF_DP}dp · 手势条 ${GESTURE_HOME_INDICATOR_DP}dp · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}+${GESTURE_HOME_INDICATOR_DP}dp`
+        : `当前状态：三键 · 三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}+${threeKeyNavH}dp`;
       bottomGapRuleText.textContent = `${FRAME_BOTTOM_TO_REF_DP}dp`;
       bottomGapScreenRuleText.textContent = `${minGapToScreenBottom}dp`;
       bottomGapScreenSumText.textContent = gestureNav
-        ? `${FRAME_BOTTOM_TO_REF_DP}`
+        ? `${FRAME_BOTTOM_TO_REF_DP}+${GESTURE_HOME_INDICATOR_DP}`
         : `${FRAME_BOTTOM_TO_REF_DP}+${threeKeyNavH}`;
       bottomGapBarHeightText.textContent = gestureNav
         ? `${GESTURE_HOME_INDICATOR_DP}dp`
@@ -1905,10 +1910,6 @@
       } else {
         frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${frameFitLabelMap[frameFitMode] || "撑满宽度"}`;
       }
-      frameTopSwitchLabel.textContent = frameTopOn
-        ? (v2ExclusiveFrameFitOn ? "当前状态：通顶 · V2专属画幅规则开启" : "当前状态：通顶（覆盖顶部 bar）")
-        : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2专属画幅规则开启（自动选撑满高/宽）" : "当前状态：不通顶");
-
       let rectW = m.width;
       let rectH = Math.round(rectW * 16 / 9);
       /** 线上规则：仅撑满高度（宽出裁左右）。9:16 撑满高度选项：窄则再满宽，视窗裁高宽。 */
@@ -1955,8 +1956,13 @@
         cameraRect.style.removeProperty("box-shadow");
       }
       frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20dp（裁剪视窗外框）"
+        ? "当前状态：开启 · 圆角 20dp（裁剪视窗外框）· 拍摄钮距画幅底 24dp（tab 随拍摄钮）"
         : "当前状态：关闭 · 无圆角";
+      frameTopSwitchLabel.textContent = frameTopOn
+        ? (v2ExclusiveFrameFitOn
+          ? "当前状态：通顶 · V2专属画幅规则开启 · 拍摄距画幅底 24dp（tab 随拍摄钮）"
+          : "当前状态：通顶（覆盖顶部 bar）· 拍摄距画幅底 24dp（tab 随拍摄钮）")
+        : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2专属画幅规则开启（自动选撑满高/宽）" : "当前状态：不通顶");
       v1ForceCoverHeightSwitchLabel.textContent = v1ForceCoverHeightOn
         ? "当前状态：开启 · 画幅展示规则置灰 · 固定撑满高度"
         : "当前状态：关闭 · 可自选画幅展示规则";
@@ -2020,10 +2026,20 @@
       const captureSvgBottomPad = 0;
       const visibleFrameBottom = useCoverHeightCrop ? topBase + availableHeight : frameTop + rectH;
       const bottomGap = Math.max(0, bottomBarTop - visibleFrameBottom);
-      const captureBottomToRefDp = CAPTURE_BOTTOM_OFFSET_DP;
-      const circleBottomInset = onlineRuleLayout || gestureNav
-        ? CAPTURE_BOTTOM_OFFSET_DP
-        : (threeKeyNavH + CAPTURE_BOTTOM_OFFSET_DP);
+      const captureFromFrameChrome = frameStyleOn || frameTopOn;
+      const frameClipBottomFromTop = useCoverHeightCrop ? (topBase + availableHeight) : (frameTop + rectH);
+      const frameBottomToScreenBottomPx = m.height - frameClipBottomFromTop;
+      const capGestScreen = FRAME_BOTTOM_TO_REF_DP + GESTURE_HOME_INDICATOR_DP + CAPTURE_FROM_FRAME_BOTTOM_DP;
+      const cap3keyScreen = threeKeyNavH + FRAME_BOTTOM_TO_REF_DP + CAPTURE_FROM_FRAME_BOTTOM_DP;
+      let circleBottomInset;
+      let captureBottomToRefDp;
+      if (captureFromFrameChrome) {
+        circleBottomInset = frameBottomToScreenBottomPx + CAPTURE_FROM_FRAME_BOTTOM_DP;
+        captureBottomToRefDp = CAPTURE_FROM_FRAME_BOTTOM_DP;
+      } else {
+        circleBottomInset = gestureNav ? capGestScreen : cap3keyScreen;
+        captureBottomToRefDp = circleBottomInset;
+      }
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
       captureCircle.style.bottom = `${circleBottomInset}px`;
@@ -2088,8 +2104,8 @@
 
       modelTitle.textContent = m.name;
       modelSpec.textContent = onlineRuleLayout
-        ? `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 线上规则：三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅层 ${rectW}×${rectH} 于视窗 ${m.width}×${availableHeight}（撑满高度，宽出裁左右） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→屏底：${captureBottomToRefDp}dp（89+16）`
-        : `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄容器底→${gestureNav ? "屏底" : "三键顶"}：${captureBottomToRefDp}dp（89+16） · 拍摄容器底→屏底：${gestureNav ? captureBottomToRefDp : (threeKeyNavH + captureBottomToRefDp)}dp`;
+        ? `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 线上规则：三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅层 ${rectW}×${rectH} 于视窗 ${m.width}×${availableHeight}（撑满高度，宽出裁左右） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄钮底→屏底：${captureFromFrameChrome ? `${CAPTURE_FROM_FRAME_BOTTOM_DP}（相对画幅底）` : cap3keyScreen}dp`
+        : `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄钮底→屏底：${captureFromFrameChrome ? `${CAPTURE_FROM_FRAME_BOTTOM_DP}（相对画幅底）` : (gestureNav ? capGestScreen : cap3keyScreen)}dp`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
