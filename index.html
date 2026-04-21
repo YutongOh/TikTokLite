@@ -1442,8 +1442,8 @@
           <span class="mode-switch-note">开：通顶覆盖顶部 bar · 拍摄钮距画幅底 24dp（tab 随拍摄钮）/ 关：不通顶</span>
         </div>
         <div class="mode-switch-row">
-          <input id="frameTopExclusiveFitSwitch" class="mode-switch" type="checkbox" aria-label="开：智能适配高/宽；关：自选展示规则（开则置灰画幅展示）" />
-          <span class="mode-switch-note">开：智能适配高/宽｜关：自选展示规则</span>
+          <input id="frameTopExclusiveFitSwitch" class="mode-switch" type="checkbox" aria-label="与 V1 第二项相同：固定撑满高度；若仍窄于屏则拉至屏宽再裁上下；开则置灰画幅展示" />
+          <span class="mode-switch-note">开：画幅置灰；优先撑满高度，若仍窄于屏则拉至屏宽再裁上下（与 V1 第二项相同）｜关：自选画幅展示规则</span>
         </div>
         <span id="frameTopSwitchLabel" class="mode-switch-label frame-style-summary">当前状态：不通顶</span>
       </section>
@@ -1834,9 +1834,9 @@
         "cover-height": "9:16 撑满高度",
       };
       const frameTopOn = frameTopSwitch.checked;
-      /** V2 第二个开关：开启后禁用「画幅展示规则」并按专属逻辑自动选 cover-height / cover-width */
+      /** V2 第二个开关：与 V1 第二项相同——置灰画幅规则并固定撑满高度（优先撑满高，窄则拉至屏宽再裁上下） */
       const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
-      /** V1 第二个开关：开启后禁用「画幅展示规则」并固定为撑满高度（非线上规则语义） */
+      /** V1 第二个开关：同上 */
       const v1ForceCoverHeightOn = v1ForceCoverHeightSwitch.checked;
       /** 线上规则：固定三键画幅几何 + 屏底拍摄；与 V1 固定撑满高度互斥 */
       const onlineRuleLayout =
@@ -1889,20 +1889,16 @@
         input.disabled = frameFitLocked;
       });
       let frameFitMode = selectedFrameFitMode;
-      if (v2ExclusiveFrameFitOn) {
-        const fullHeightFrameW = Math.round(availableHeight * 9 / 16);
-        frameFitMode = fullHeightFrameW < m.width ? "cover-width" : "cover-height";
-      } else if (v1ForceCoverHeightOn) {
+      if (v2ExclusiveFrameFitOn || v1ForceCoverHeightOn) {
         frameFitMode = "cover-height";
       } else if (selectedFrameFitMode === "contain") {
         /** 线上规则：按撑满高度计算画幅；底部采用三键几何 + 固定拍摄距屏底 */
         frameFitMode = "cover-height";
       }
-      const frameFitStatusPrefix = v2ExclusiveFrameFitOn ? "当前状态：V2 专属 · " : "当前状态：";
-      if (v2ExclusiveFrameFitOn) {
-        frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${frameFitLabelMap[frameFitMode] || "撑满宽度"}`;
-      } else if (v1ForceCoverHeightOn) {
-        frameFitSwitchLabel.textContent = "当前状态：V1 · 固定撑满高度（画幅展示规则已置灰）";
+      const frameFitStatusPrefix = "当前状态：";
+      if (v2ExclusiveFrameFitOn || v1ForceCoverHeightOn) {
+        const tag = v2ExclusiveFrameFitOn && v1ForceCoverHeightOn ? "V1+V2" : v2ExclusiveFrameFitOn ? "V2" : "V1";
+        frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${tag} · 固定撑满高度（画幅展示规则已置灰）`;
       } else if (selectedFrameFitMode === "contain") {
         frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}线上规则 · 撑满高度`;
       } else if (selectedFrameFitMode === "cover-height") {
@@ -1928,8 +1924,8 @@
         /** 用 floor 判定「撑满高后的宽度」是否窄于屏，避免 round 贴边时误判为已满宽 */
         const wFillFloor = Math.floor(availableHeight * 9 / 16);
         const hFillW = Math.round(availableHeight * 9 / 16);
-        if (v1ForceCoverHeightOn) {
-          /** V1 第二项：优先撑满高度；若仍窄于屏则 9:16 放大至宽=屏宽，再裁上下 */
+        if (v1ForceCoverHeightOn || v2ExclusiveFrameFitOn) {
+          /** V1/V2 第二项：优先撑满高度；若仍窄于屏则 9:16 放大至宽=屏宽，再裁上下 */
           if (wFillFloor < m.width) {
             rectW = m.width;
             rectH = Math.round(m.width * 16 / 9);
@@ -1975,9 +1971,9 @@
         : "当前状态：关闭 · 无圆角";
       frameTopSwitchLabel.textContent = frameTopOn
         ? (v2ExclusiveFrameFitOn
-          ? "当前状态：通顶 · V2专属画幅规则开启 · 拍摄距画幅底 24dp（tab 随拍摄钮）"
+          ? "当前状态：通顶 · V2 第二项固定撑满高度 · 拍摄距画幅底 24dp（tab 随拍摄钮）"
           : "当前状态：通顶（覆盖顶部 bar）· 拍摄距画幅底 24dp（tab 随拍摄钮）")
-        : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2专属画幅规则开启（自动选撑满高/宽）" : "当前状态：不通顶");
+        : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2 第二项固定撑满高度（与 V1 第二项相同）" : "当前状态：不通顶");
       v1ForceCoverHeightSwitchLabel.textContent = v1ForceCoverHeightOn
         ? "当前状态：开启 · 画幅展示规则置灰 · 固定撑满高度"
         : "当前状态：关闭 · 可自选画幅展示规则";
