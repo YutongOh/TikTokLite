@@ -2091,11 +2091,7 @@
       rangeText.textContent = `${bucket.label} (${bucket.helper}) · ${bucket.minW}×${bucket.minH} ~ ${bucket.maxW}×${bucket.maxH}（${bucket.models.length}台）`;
       sizeText.textContent = `${m.width}×${m.height} dp`;
       ratioText.textContent = ratio;
-      rectSizeText.textContent = useCoverHeightCrop
-        ? (onlineRuleLayout
-          ? `${rectW}×${rectH}（视窗 ${m.width}×${availableHeight} · 撑满高度 · 宽出裁左右）`
-          : `${rectW}×${rectH}（视窗 ${m.width}×${availableHeight} · 居中裁高宽）`)
-        : `${rectW}×${rectH} dp`;
+      rectSizeText.textContent = `${rectW}×${rectH} dp`;
       sideGapText.textContent = sideGap > 0 ? `${sideGap}dp` : "无";
       bottomGapText.textContent = `${bottomGap}dp`;
       modelCurrent.textContent = `${isCommonModel ? "常用机型" : "当前机型"}：${m.name} · ${m.width}×${m.height}`;
