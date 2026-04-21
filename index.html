@@ -1398,7 +1398,7 @@
           <strong>不勾选（手势）</strong>：画幅底距<strong>手势导航参考</strong> <code id="bottomGapGestureHint">64dp</code>；画幅底距<strong>屏幕底</strong> <strong>64+24dp</strong>。<br />
           <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已扣底部预留。<br />
           <strong>撑满高度</strong>：先 <code>h = availableHeight</code>、<code>w = h × 9/16</code>；若 <code>w &lt; 屏宽</code> 则改为 <code>w = 屏宽</code>、<code>h = w × 16/9</code>，在 <code>屏宽 × availableHeight</code> 视窗内<strong>居中裁剪上下</strong>（仍 9:16）。<br />
-          <strong>线上规则</strong>：画幅按「撑满高度」展示；<strong>拍摄按钮固定距屏底 89+16dp</strong>（置灰时失效）。
+          <strong>画幅展示规则（线上）</strong>：V1/V2 均关闭时 → <strong>拍摄按钮固定距屏底 89+16dp</strong>；任一 V1/V2 开启时 → 画幅规则置灰、按钮改为<strong>距画幅底 24dp</strong>。V1 两开关（圆角 + 固定撑满高度）、V2 两开关（通顶 + 固定撑满高度）各组共同开关。
         </p>
       </div>
 
@@ -1834,13 +1834,14 @@
         "cover-height": "撑满高度",
       };
       const frameTopOn = frameTopSwitch.checked;
-      /** V2 第二个开关：与 V1 第二项相同——置灰画幅规则并固定撑满高度（优先撑满高，窄则拉至屏宽再裁上下） */
       const v2ExclusiveFrameFitOn = frameTopExclusiveFitSwitch.checked;
-      /** V1 第二个开关：同上 */
       const v1ForceCoverHeightOn = v1ForceCoverHeightSwitch.checked;
-      /** 线上规则：固定三键画幅几何 + 屏底拍摄；与 V1 固定撑满高度互斥 */
-      const onlineRuleLayout =
-        selectedFrameFitMode === "contain" && !v2ExclusiveFrameFitOn && !v1ForceCoverHeightOn;
+      /** V1 两开关（圆角 + 固定撑满高度）、V2 两开关（通顶 + 固定撑满高度）共同开关：任意一个关/开 → 组内同步 */
+      const v1On = frameStyleSwitch.checked;
+      const v2On = frameTopOn;
+      const anyV1V2On = v1On || v2On || v1ForceCoverHeightOn || v2ExclusiveFrameFitOn;
+      /** 画幅展示规则可用（仅在 V1/V2 两组开关都关闭时）：拍摄钮固定距屏底 105dp；任意 V1/V2 开启则改按「距画幅底 24dp」 */
+      const onlineRuleLayout = !anyV1V2On;
 
       const stageWidth = 360;
       const stageHeight = 800;
@@ -1883,21 +1884,21 @@
       const topBase = frameTopOn ? 0 : m.statusBarHeight;
       const bottomBarTop = m.height - bottomBarHeight;
       let availableHeight = m.height - frameBottomInsetDp - topBase;
-      const frameFitLocked = v2ExclusiveFrameFitOn || v1ForceCoverHeightOn;
+      /** V1/V2 任意开关开启时置灰画幅展示规则并固定撑满高度 */
+      const frameFitLocked = anyV1V2On;
       frameFitOptions.classList.toggle("is-disabled", frameFitLocked);
       frameFitModeInputs.forEach((input) => {
         input.disabled = frameFitLocked;
       });
       let frameFitMode = selectedFrameFitMode;
-      if (v2ExclusiveFrameFitOn || v1ForceCoverHeightOn) {
+      if (anyV1V2On) {
         frameFitMode = "cover-height";
       } else if (selectedFrameFitMode === "contain") {
-        /** 线上规则：按撑满高度计算画幅；底部采用三键几何 + 固定拍摄距屏底 */
         frameFitMode = "cover-height";
       }
       const frameFitStatusPrefix = "当前状态：";
-      if (v2ExclusiveFrameFitOn || v1ForceCoverHeightOn) {
-        const tag = v2ExclusiveFrameFitOn && v1ForceCoverHeightOn ? "V1+V2" : v2ExclusiveFrameFitOn ? "V2" : "V1";
+      if (anyV1V2On) {
+        const tag = v1On && v2On ? "V1+V2" : v2On ? "V2" : "V1";
         frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}${tag} · 固定撑满高度（画幅展示规则已置灰）`;
       } else if (selectedFrameFitMode === "cover-width") {
         frameFitSwitchLabel.textContent = `${frameFitStatusPrefix}撑满宽度`;
@@ -1950,17 +1951,15 @@
         cameraRect.style.borderRadius = "0";
         cameraRect.style.removeProperty("box-shadow");
       }
-      frameStyleSwitchLabel.textContent = frameStyleOn
-        ? "当前状态：开启 · 圆角 20dp（裁剪视窗外框）· 拍摄钮距画幅底 24dp（tab 随拍摄钮）"
-        : "当前状态：关闭 · 无圆角";
-      frameTopSwitchLabel.textContent = frameTopOn
-        ? (v2ExclusiveFrameFitOn
-          ? "当前状态：通顶 · V2 第二项固定撑满高度 · 拍摄距画幅底 24dp（tab 随拍摄钮）"
-          : "当前状态：通顶（覆盖顶部 bar）· 拍摄距画幅底 24dp（tab 随拍摄钮）")
-        : (v2ExclusiveFrameFitOn ? "当前状态：不通顶 · V2 第二项固定撑满高度（与 V1 第二项相同）" : "当前状态：不通顶");
-      v1ForceCoverHeightSwitchLabel.textContent = v1ForceCoverHeightOn
-        ? "当前状态：开启 · 画幅展示规则置灰 · 固定撑满高度"
-        : "当前状态：关闭 · 可自选画幅展示规则";
+      frameStyleSwitchLabel.textContent = v1On
+        ? "当前状态：V1 开启 · 圆角 20dp · 固定撑满高度 · 拍摄钮距画幅底 24dp"
+        : "当前状态：V1 关闭 · 无圆角";
+      frameTopSwitchLabel.textContent = v2On
+        ? "当前状态：V2 开启 · 通顶 · 固定撑满高度 · 拍摄钮距画幅底 24dp"
+        : "当前状态：V2 关闭 · 不通顶";
+      v1ForceCoverHeightSwitchLabel.textContent = v1On
+        ? "当前状态：V1 开启 · 画幅展示规则已置灰"
+        : "当前状态：V1 关闭 · 可自选画幅展示规则";
       /** 原「工具栏跟随画幅」开关已并入固定逻辑：距画幅顶端 16dp */
       const toolbarFollowFrameOn = true;
 
@@ -2021,24 +2020,19 @@
       const captureSvgBottomPad = 0;
       const visibleFrameBottom = useCoverHeightCrop ? topBase + availableHeight : frameTop + rectH;
       const bottomGap = Math.max(0, bottomBarTop - visibleFrameBottom);
-      const captureFromFrameChrome = frameStyleOn || frameTopOn;
+      const captureFromFrameChrome = anyV1V2On;
       const frameClipBottomFromTop = useCoverHeightCrop ? (topBase + availableHeight) : (frameTop + rectH);
       const frameBottomToScreenBottomPx = m.height - frameClipBottomFromTop;
-      const capGestScreen = FRAME_BOTTOM_TO_REF_DP + GESTURE_HOME_INDICATOR_DP + CAPTURE_FROM_FRAME_BOTTOM_DP;
-      const cap3keyScreen = threeKeyNavH + FRAME_BOTTOM_TO_REF_DP + CAPTURE_FROM_FRAME_BOTTOM_DP;
-      /** 线上规则：拍摄按钮固定距屏底 89+16dp；置灰（V1/V2 第二项开启）时回退到各自规则 */
+      /** 画幅展示规则激活（V1/V2 均关闭）：拍摄按钮固定距屏底 89+16dp；任意 V1/V2 开启则按距画幅底 24dp */
       const ONLINE_CAPTURE_FROM_SCREEN_BOTTOM_DP = 89 + 16;
       let circleBottomInset;
       let captureBottomToRefDp;
-      if (onlineRuleLayout) {
-        circleBottomInset = ONLINE_CAPTURE_FROM_SCREEN_BOTTOM_DP;
-        captureBottomToRefDp = ONLINE_CAPTURE_FROM_SCREEN_BOTTOM_DP;
-      } else if (captureFromFrameChrome) {
+      if (captureFromFrameChrome) {
         circleBottomInset = frameBottomToScreenBottomPx + CAPTURE_FROM_FRAME_BOTTOM_DP;
         captureBottomToRefDp = CAPTURE_FROM_FRAME_BOTTOM_DP;
       } else {
-        circleBottomInset = gestureNav ? capGestScreen : cap3keyScreen;
-        captureBottomToRefDp = circleBottomInset;
+        circleBottomInset = ONLINE_CAPTURE_FROM_SCREEN_BOTTOM_DP;
+        captureBottomToRefDp = ONLINE_CAPTURE_FROM_SCREEN_BOTTOM_DP;
       }
       captureCircle.style.width = `${circleSize}px`;
       captureCircle.style.height = `${circleSize}px`;
@@ -2105,7 +2099,7 @@
       modelTitle.textContent = m.name;
       modelSpec.textContent = onlineRuleLayout
         ? `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 线上规则：画幅撑满高度（窄则满宽裁上下）· 画幅层 ${rectW}×${rectH} 于视窗 ${m.width}×${availableHeight} · 拍摄钮底→屏底：${ONLINE_CAPTURE_FROM_SCREEN_BOTTOM_DP}dp（89+16）`
-        : `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄钮底→屏底：${captureFromFrameChrome ? `${CAPTURE_FROM_FRAME_BOTTOM_DP}（相对画幅底）` : (gestureNav ? capGestScreen : cap3keyScreen)}dp`;
+        : `屏幕逻辑像素：${m.width}×${m.height} · 状态栏高度：${m.statusBarHeight}dp · 画幅顶部：${frameTop}dp${frameTopOffset ? `（含下移 ${frameTopOffset}dp）` : ""} · 底部导航：${gestureNav ? "手势" : "三键"} · 示意栏高 ${bottomBarHeight}dp · 画幅底→参考线：${bottomGap}dp（规则 ${minGapToBottomBar}dp 至${gestureNav ? "屏底" : "三键顶"}） · 画幅底→屏底：${minGapToScreenBottom}dp · 拍摄钮底→画幅底：${CAPTURE_FROM_FRAME_BOTTOM_DP}dp`;
       modelLinkWrap.innerHTML = "";
 
       // Restart video from the beginning whenever size/model selection changes.
@@ -2137,11 +2131,23 @@
       render();
     }
     frameFitModeInputs.forEach((input) => input.addEventListener("input", onFrameFitModeInput));
-    frameTopSwitch.addEventListener("input", render);
-    frameTopExclusiveFitSwitch.addEventListener("input", render);
+    /** V1 两开关（圆角 + 固定撑满高度）共同开关 */
+    function syncV1Pair(source) {
+      const nextChecked = source.checked;
+      if (frameStyleSwitch.checked !== nextChecked) frameStyleSwitch.checked = nextChecked;
+      if (v1ForceCoverHeightSwitch.checked !== nextChecked) v1ForceCoverHeightSwitch.checked = nextChecked;
+    }
+    /** V2 两开关（通顶 + 固定撑满高度）共同开关 */
+    function syncV2Pair(source) {
+      const nextChecked = source.checked;
+      if (frameTopSwitch.checked !== nextChecked) frameTopSwitch.checked = nextChecked;
+      if (frameTopExclusiveFitSwitch.checked !== nextChecked) frameTopExclusiveFitSwitch.checked = nextChecked;
+    }
+    frameTopSwitch.addEventListener("input", (e) => { syncV2Pair(e.currentTarget); render(); });
+    frameTopExclusiveFitSwitch.addEventListener("input", (e) => { syncV2Pair(e.currentTarget); render(); });
     bottomGapSwitch.addEventListener("input", render);
-    frameStyleSwitch.addEventListener("input", render);
-    v1ForceCoverHeightSwitch.addEventListener("input", render);
+    frameStyleSwitch.addEventListener("input", (e) => { syncV1Pair(e.currentTarget); render(); });
+    v1ForceCoverHeightSwitch.addEventListener("input", (e) => { syncV1Pair(e.currentTarget); render(); });
 
     setupRangeTicks();
     if (!setDefaultSelectionBySize(DEFAULT_MODEL_SIZE)) {
