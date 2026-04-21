@@ -1397,8 +1397,9 @@
           <strong>勾选（三键）</strong>：画幅底距<strong>三键栏顶</strong> <code id="bottomGapRuleText">64dp</code>；画幅底距<strong>屏幕底</strong> <code id="bottomGapScreenRuleText">64+三键高</code>（<code id="bottomGapScreenSumText">64+栏高</code>，栏高 <code id="bottomGapBarHeightText">按机型</code>）。<br />
           <strong>不勾选（手势）</strong>：画幅底距<strong>手势导航参考</strong> <code id="bottomGapGestureHint">64dp</code>；画幅底距<strong>屏幕底</strong> <strong>64+24dp</strong>。<br />
           <code>top</code> 由通顶/状态栏决定；<code>availableHeight</code> 已扣底部预留。<br />
-          <strong>撑满高度</strong>：先 <code>h = availableHeight</code>、<code>w = h × 9/16</code>；若 <code>w &lt; 屏宽</code> 则改为 <code>w = 屏宽</code>、<code>h = w × 16/9</code>，在 <code>屏宽 × availableHeight</code> 视窗内<strong>居中裁剪上下</strong>（仍 9:16）。<br />
-          <strong>画幅展示规则（线上）</strong>：V1/V2 均关闭时 → <strong>拍摄按钮固定距屏底 89+16dp</strong>；任一 V1/V2 开启时 → 画幅规则置灰、按钮改为<strong>距画幅底 24dp</strong>。V1 两开关（圆角 + 固定撑满高度）、V2 两开关（通顶 + 固定撑满高度）各组共同开关。
+          <strong>撑满高度（9:16）</strong>：<code>h = availableHeight</code>、<code>w = h × 9/16</code>；窄于屏宽留左右、宽于屏宽视窗裁左右（严格 9:16）。<br />
+          <strong>线上规则（9:16）</strong>：先撑满高度；若 <code>w &lt; 屏宽</code>，改为 <code>w = 屏宽</code>、<code>h = w × 16/9</code>，视窗内居中裁上下（仍 9:16）。<br />
+          <strong>拍摄按钮</strong>：V1/V2 均关闭（画幅展示规则激活）→ 固定距屏底 <strong>89+16dp</strong>；任一 V1/V2 开启 → 画幅规则置灰，按钮改为<strong>距画幅底 24dp</strong>。V1 两开关（圆角 + 固定撑满高度）、V2 两开关（通顶 + 固定撑满高度）各组共同开关。
         </p>
       </div>
 
@@ -1920,10 +1921,13 @@
         rectH = Math.min(fullWidthFrameH, availableHeight);
       } else if (frameFitMode === "cover-height") {
         useCoverHeightCrop = true;
-        /** 撑满高度：先 h=availableHeight、w=h*9/16；若宽窄于屏，则改撑满宽再裁上下。适用于线上规则、cover-height 选项、V1/V2 第二项。 */
+        /** 始终保持 9:16：
+         *  · 「撑满高度」选项：严格撑满高度 → h=availableHeight、w=h*9/16（窄于屏留左右，宽于屏视窗裁左右）。
+         *  · 「线上规则」/ V1/V2 开启：撑满高度 + 窄则满宽裁上下（仍 9:16）。 */
         const wFillFloor = Math.floor(availableHeight * 9 / 16);
         const hFillW = Math.round(availableHeight * 9 / 16);
-        if (wFillFloor < m.width) {
+        const allowWidthFallback = anyV1V2On || selectedFrameFitMode === "contain";
+        if (allowWidthFallback && wFillFloor < m.width) {
           rectW = m.width;
           rectH = Math.round(m.width * 16 / 9);
         } else {
