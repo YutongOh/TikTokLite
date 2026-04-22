@@ -1855,8 +1855,8 @@
       statusBar.style.background = frameTopOn
         ? "transparent"
         : "linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.25))";
-      /** 勾选开关 = 三键导航；不勾选 = 手势导航（与早期版本相比已对调）；线上规则时强制三键画幅几何并锁定开关 */
-      const gestureNav = onlineRuleLayout ? false : !bottomGapSwitch.checked;
+      /** 勾选开关 = 三键导航；不勾选 = 手势导航。与 V1/V2 画幅规则独立，避免切换时底部导航示意跳变。 */
+      const gestureNav = !bottomGapSwitch.checked;
       const threeKeyNavH = getThreeKeyNavHeightDp(m);
       const bottomBarHeight = gestureNav ? GESTURE_HOME_INDICATOR_DP : threeKeyNavH;
       bottomBar.style.height = `${bottomBarHeight}px`;
@@ -1866,11 +1866,9 @@
         : threeKeyNavH + FRAME_BOTTOM_TO_REF_DP;
       const minGapToBottomBar = FRAME_BOTTOM_TO_REF_DP;
       const minGapToScreenBottom = frameBottomInsetDp;
-      bottomGapCard.classList.toggle("is-disabled", onlineRuleLayout);
-      bottomGapSwitch.disabled = onlineRuleLayout;
-      bottomGapSwitchLabel.textContent = onlineRuleLayout
-        ? `线上规则：画幅撑满高度（窄则满宽裁上下）· 拍摄钮固定距屏底 89+16dp · 适配底部导航已锁定`
-        : gestureNav
+      bottomGapCard.classList.remove("is-disabled");
+      bottomGapSwitch.disabled = false;
+      bottomGapSwitchLabel.textContent = gestureNav
         ? `当前状态：手势 · 距手势导航 ${FRAME_BOTTOM_TO_REF_DP}dp · 手势条 ${GESTURE_HOME_INDICATOR_DP}dp · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}+${GESTURE_HOME_INDICATOR_DP}dp`
         : `当前状态：三键 · 三键栏 ${threeKeyNavH}dp · 画幅距三键顶 ${FRAME_BOTTOM_TO_REF_DP}dp · 画幅距屏底 ${FRAME_BOTTOM_TO_REF_DP}+${threeKeyNavH}dp`;
       bottomGapRuleText.textContent = `${FRAME_BOTTOM_TO_REF_DP}dp`;
